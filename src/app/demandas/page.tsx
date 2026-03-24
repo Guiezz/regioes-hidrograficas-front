@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// 1. Troca de useSearchParams para useReservoir
 import { useReservoir } from "@/context/ReservoirContext";
 import Image from "next/image";
 import { getSections } from "@/services/api";
@@ -24,7 +23,6 @@ interface Section {
 }
 
 export default function DemandasPage() {
-  // 2. Acesso ao Contexto Global
   const { selectedReservoir } = useReservoir();
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -32,15 +30,12 @@ export default function DemandasPage() {
 
   useEffect(() => {
     async function fetchData() {
-      // Só busca se houver um reservatório selecionado
       if (!selectedReservoir) return;
 
       setLoading(true);
       try {
-        // 3. Busca dinâmica pelo ID do contexto
         const data = await getSections(selectedReservoir.id);
 
-        // Filtra capitulo 4 (Demandas)
         const demandasSections = data
           .filter((s: Section) => s.number.startsWith("4"))
           .sort((a: Section, b: Section) =>
@@ -55,8 +50,7 @@ export default function DemandasPage() {
       }
     }
     fetchData();
-  }, [selectedReservoir]); // 4. Dependência atualizada
-
+  }, [selectedReservoir]);
   const renderContent = (text: string) => {
     if (!text) return null;
     return text.split("\n").map((line, index) => (
@@ -75,8 +69,6 @@ export default function DemandasPage() {
       "http://localhost:8080";
     return `${baseUrl}/assets/${imageName}`;
   };
-
-  // Função getBasinName removida
 
   if (loading) {
     return (
@@ -97,7 +89,6 @@ export default function DemandasPage() {
   return (
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-6 py-20 lg:py-32">
-        {/* Header Editorial */}
         <header className="mb-20 space-y-10">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
@@ -161,17 +152,17 @@ export default function DemandasPage() {
                 <TabsContent
                   key={tab.id}
                   value={tab.number}
-                  className="space-y-32 animate-in fade-in slide-in-from-bottom-4 duration-700"
+                  className="space-y-20 animate-in fade-in slide-in-from-bottom-4 duration-700"
                 >
                   {/* Descrição da Aba */}
                   {tab.content && (
-                    <div className="max-w-4xl border-l-2 border-blue-100 pl-8 italic">
+                    <div className="max-w-4xl border-l-2 border-blue-100 pl-4 italic">
                       {renderContent(tab.content)}
                     </div>
                   )}
 
                   {/* Artigos de Nível 3 */}
-                  <div className="space-y-22">
+                  <div className="space-y-4">
                     {children.map((child) => {
                       const subItems = sections.filter(
                         (s) =>
@@ -180,7 +171,7 @@ export default function DemandasPage() {
 
                       return (
                         <article key={child.id} className="group">
-                          <div className="flex flex-col gap-10">
+                          <div className="flex flex-col gap-5">
                             <header className="space-y-4">
                               <h3 className="text-3xl font-bold text-slate-800 tracking-tight">
                                 {child.title}
@@ -213,7 +204,7 @@ export default function DemandasPage() {
                                 {subItems.map((subItem) => (
                                   <div
                                     key={subItem.id}
-                                    className="p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors"
+                                    className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-blue-200 transition-colors"
                                   >
                                     <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-3">
                                       <ChevronRight className="w-4 h-4 text-blue-500" />
