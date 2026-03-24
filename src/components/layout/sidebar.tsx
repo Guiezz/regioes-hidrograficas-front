@@ -163,15 +163,6 @@ export function Sidebar({
           ))}
         </div>
       </div>
-
-      {/* FOOTER DA SIDEBAR */}
-      {(!collapsed || isMobile) && (
-        <div className="px-3 py-2">
-          <div className="bg-slate-800 rounded-lg p-3 text-xs text-zinc-400 text-center whitespace-nowrap overflow-hidden text-ellipsis">
-            Versão 1.0.0
-          </div>
-        </div>
-      )}
     </div>
   );
 }
