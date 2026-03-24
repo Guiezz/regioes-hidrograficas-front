@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// 1. Troca de useSearchParams para useReservoir
 import { useReservoir } from "@/context/ReservoirContext";
 import Image from "next/image";
 import { getSections } from "@/services/api";
@@ -17,7 +16,6 @@ interface Section {
 }
 
 export default function InfraestruturaPage() {
-  // 2. Acesso ao Contexto Global
   const { selectedReservoir } = useReservoir();
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -25,15 +23,12 @@ export default function InfraestruturaPage() {
 
   useEffect(() => {
     async function fetchData() {
-      // Só busca se houver um reservatório selecionado
       if (!selectedReservoir) return;
 
       setLoading(true);
       try {
-        // 3. Busca dinâmica pelo ID do contexto
         const data = await getSections(selectedReservoir.id);
 
-        // Filtra capitulo 3 (Infraestrutura)
         const infraSections = data
           .filter((s: Section) => s.number.startsWith("3"))
           .sort((a: Section, b: Section) =>
@@ -47,7 +42,7 @@ export default function InfraestruturaPage() {
       }
     }
     fetchData();
-  }, [selectedReservoir]); // 4. Dependência atualizada
+  }, [selectedReservoir]);
 
   const renderContent = (text: string) => {
     if (!text) return null;
@@ -67,8 +62,6 @@ export default function InfraestruturaPage() {
       "http://localhost:8080";
     return `${baseUrl}/assets/${imageName}`;
   };
-
-  // Função getBasinName removida
 
   if (loading) {
     return (
@@ -90,7 +83,7 @@ export default function InfraestruturaPage() {
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-6 py-20 lg:py-32">
         {/* Header Editorial - Azul Sutil */}
-        <header className="mb-32 space-y-10">
+        <header className="mb-20 space-y-10">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
@@ -121,7 +114,7 @@ export default function InfraestruturaPage() {
         </header>
 
         {/* Listagem de Seções */}
-        <div className="space-y-10">
+        <div className="space-y-3">
           {subSections.map((section) => {
             const children = sections.filter(
               (s) => s.level === 3 && s.number.startsWith(section.number),
@@ -129,7 +122,7 @@ export default function InfraestruturaPage() {
 
             return (
               <article key={section.id} className="relative">
-                <div className="flex flex-col gap-12">
+                <div className="flex flex-col gap-4">
                   {/* Título com Identidade Azul */}
                   <div className="space-y-2">
                     <h2 className="text-3xl md:text-4xl font-bold text-slate-800 tracking-tight">
@@ -163,7 +156,7 @@ export default function InfraestruturaPage() {
 
                   {/* Sub-itens (Nível 3) em Grid Azulado */}
                   {children.length > 0 && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
                       {children.map((child) => (
                         <div
                           key={child.id}

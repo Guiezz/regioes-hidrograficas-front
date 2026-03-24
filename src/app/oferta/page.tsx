@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// 1. Troca de useSearchParams para useReservoir
 import { useReservoir } from "@/context/ReservoirContext";
 import Image from "next/image";
 import { getSections } from "@/services/api";
@@ -25,7 +24,6 @@ interface Section {
 }
 
 export default function OfertaPage() {
-  // 2. Acesso ao Contexto Global
   const { selectedReservoir } = useReservoir();
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -33,15 +31,12 @@ export default function OfertaPage() {
 
   useEffect(() => {
     async function fetchData() {
-      // Só busca se houver um reservatório selecionado
       if (!selectedReservoir) return;
 
       setLoading(true);
       try {
-        // 3. Busca dinâmica pelo ID do contexto
         const data = await getSections(selectedReservoir.id);
 
-        // Filtra capitulo 5 (Disponibilidade Hídrica)
         const ofertaSections = data
           .filter((s: Section) => s.number.startsWith("5"))
           .sort((a: Section, b: Section) =>
@@ -56,7 +51,7 @@ export default function OfertaPage() {
       }
     }
     fetchData();
-  }, [selectedReservoir]); // 4. Dependência atualizada
+  }, [selectedReservoir]);
 
   const renderContent = (text: string) => {
     if (!text) return null;
@@ -165,15 +160,14 @@ export default function OfertaPage() {
                   value={tab.number}
                   className="space-y-16 md:space-y-24 animate-in fade-in slide-in-from-bottom-4 duration-700 focus-visible:outline-none"
                 >
-                  {/* Descrição da Aba */}
                   {tab.content && (
-                    <div className="max-w-4xl border-l-2 border-blue-100 pl-6 md:pl-8 italic">
+                    <div className="max-w-4xl border-l-2 border-blue-100 pl-2 md:pl-4 italic">
                       {renderContent(tab.content)}
                     </div>
                   )}
 
                   {/* Grid de Conteúdo */}
-                  <div className="space-y-16 md:space-y-22">
+                  <div className="space-y-6 md:space-y-12">
                     {children.map((child) => {
                       const subItems =
                         child.level === 3
@@ -186,7 +180,7 @@ export default function OfertaPage() {
 
                       return (
                         <article key={child.id} className="group">
-                          <div className="flex flex-col gap-8 md:gap-10">
+                          <div className="flex flex-col gap-8 md:gap-4">
                             <header className="space-y-4">
                               <h3 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight flex items-center gap-3">
                                 {child.title
