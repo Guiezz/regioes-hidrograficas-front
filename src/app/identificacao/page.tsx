@@ -57,11 +57,14 @@ export default function IdentificacaoPage() {
     ));
   };
 
-  const getImageUrl = (imageName: string) => {
+  const getImageUrl = (imagePath: string) => {
     const baseUrl =
       process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ||
       "http://localhost:8080";
-    return `${baseUrl}/assets/${imageName}`;
+
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+
+    return `${baseUrl}${cleanPath}`;
   };
 
   if (loading) {
