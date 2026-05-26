@@ -238,7 +238,7 @@ export default function MatrizPage() {
                           <p className="text-[15px] font-semibold text-slate-800 leading-snug whitespace-normal wrap-break-word hyphens-auto">
                             {item.acoes_especificas}
                           </p>
-                          <p className="text-[11px] text-blue-500 font-bold uppercase tracking-wider">
+                          <p className="text-[11px] text-blue-500 font-bold uppercase tracking-wider whitespace-normal wrap-break-word">
                             {item.programa}
                           </p>
                         </div>

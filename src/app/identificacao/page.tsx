@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-// 1. Troca de useSearchParams para useReservoir
 import { useReservoir } from "@/context/ReservoirContext";
 import Image from "next/image";
 import { getSections } from "@/services/api";
@@ -17,7 +16,6 @@ interface Section {
 }
 
 export default function IdentificacaoPage() {
-  // 2. Acesso ao Contexto Global
   const { selectedReservoir } = useReservoir();
 
   const [sections, setSections] = useState<Section[]>([]);
@@ -25,15 +23,12 @@ export default function IdentificacaoPage() {
 
   useEffect(() => {
     async function fetchData() {
-      // Só busca se houver um reservatório selecionado
       if (!selectedReservoir) return;
 
       setLoading(true);
       try {
-        // 3. Busca dinâmica pelo ID do contexto
         const data = await getSections(selectedReservoir.id);
 
-        // Filtra capitulo 1 (Identificação)
         const sortedData = data
           .filter((s: Section) => s.number.startsWith("1"))
           .sort((a: Section, b: Section) =>
@@ -48,7 +43,7 @@ export default function IdentificacaoPage() {
       }
     }
     fetchData();
-  }, [selectedReservoir]); // 4. Dependência atualizada
+  }, [selectedReservoir]);
 
   const renderContent = (text: string) => {
     if (!text) return null;
@@ -62,14 +57,15 @@ export default function IdentificacaoPage() {
     ));
   };
 
-  const getImageUrl = (imageName: string) => {
+  const getImageUrl = (imagePath: string) => {
     const baseUrl =
       process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ||
       "http://localhost:8080";
-    return `${baseUrl}/assets/${imageName}`;
-  };
 
-  // Função getBasinName removida
+    const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+
+    return `${baseUrl}${cleanPath}`;
+  };
 
   if (loading) {
     return (
@@ -90,7 +86,6 @@ export default function IdentificacaoPage() {
   return (
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
       <div className="max-w-4xl mx-auto px-6 py-20 lg:py-32">
-        {/* Header Minimalista */}
         <header className="mb-24 space-y-8">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
@@ -106,7 +101,6 @@ export default function IdentificacaoPage() {
             <div className="flex items-center gap-2 text-slate-400">
               <MapPin className="w-4 h-4 text-blue-500" />
               <span className="text-sm font-medium italic">
-                {/* 5. Nome dinâmico */}
                 {selectedReservoir?.name
                   ? `Região Hidrográfica do ${selectedReservoir.name}`
                   : "Carregando..."}
@@ -123,21 +117,18 @@ export default function IdentificacaoPage() {
           )}
         </header>
 
-        {/* Conteúdo em Artigos */}
-        <div className="space-y-22">
+        <div className="space-y-5">
           {subSections.map((section) => (
             <article key={section.id} className="relative group">
-              <div className="grid grid-cols-1 gap-12">
-                {/* Título da Seção */}
+              <div className="grid grid-cols-1 gap-2.5">
                 <div className="space-y-4">
                   <h2 className="text-4xl font-bold text-slate-800 tracking-tight transition-colors group-hover:text-slate-900">
                     {section.title}
                   </h2>
                 </div>
 
-                {/* Área da Imagem - Estilo Frame Editorial */}
                 {section.image && (
-                  <div className="relative">
+                  <div className="relative pb-5">
                     <div className="overflow-hidden bg-slate-50 rounded-2xl border border-slate-200 shadow-sm">
                       <Image
                         src={getImageUrl(section.image)}
@@ -158,7 +149,6 @@ export default function IdentificacaoPage() {
                   </div>
                 )}
 
-                {/* Texto Justificado com Hifenização */}
                 <div className="max-w-4xl">
                   {renderContent(section.content)}
                 </div>
@@ -167,7 +157,6 @@ export default function IdentificacaoPage() {
           ))}
         </div>
 
-        {/* Rodapé da Página */}
         <footer className="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
           <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
           <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400"></p>
