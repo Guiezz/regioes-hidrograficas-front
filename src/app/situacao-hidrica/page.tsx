@@ -119,7 +119,7 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
   const Icon = ICON_MAP[kpi.icon] || Droplets;
 
   return (
-    <div className={`rounded-2xl p-5 border ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border}`}>
+    <div className={`rounded-2xl p-5 border overflow-hidden ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border}`}>
       <div className="flex items-start justify-between mb-3">
         <div className={`p-2 rounded-xl bg-white/80 ${styles.icon}`}>
           <Icon className="w-5 h-5" />
@@ -212,7 +212,7 @@ export default function SituacaoHidricaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
+    <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
       <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         <header className="mb-16 space-y-10">
           <div className="flex items-center gap-4">
@@ -242,21 +242,21 @@ export default function SituacaoHidricaPage() {
           </div>
         ) : (
           <>
-            <div className="sticky top-4 z-20 mb-12">
+            <div className="sticky top-4 z-20 mb-12 overflow-hidden">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <Tabs
                   value={activeTab}
                   onValueChange={(v) => setActiveTab(v as TabKey)}
                 >
-                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-full border border-slate-200 shadow-sm h-12 inline-flex w-full md:w-auto">
+                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm h-auto min-h-12 inline-flex flex-wrap w-full gap-1">
                     {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
                       ([key, cfg]) => (
                         <TabsTrigger
                           key={key}
                           value={key}
-                          className="rounded-full px-4 md:px-6 text-xs md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center gap-2"
+                          className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center gap-1.5 shrink-0"
                         >
-                          <cfg.icon className="w-4 h-4" />
+                          <cfg.icon className="w-3.5 h-3.5" />
                           <span className="hidden md:inline">{cfg.label}</span>
                           <span className="md:hidden">{cfg.sectionLabel}</span>
                         </TabsTrigger>
@@ -312,7 +312,7 @@ export default function SituacaoHidricaPage() {
                                 </h2>
                               </div>
                               {section.image && (
-                                <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm mx-auto">
+                                <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm mx-auto max-w-full">
                                   <Image
                                     src={getImageUrl(section.image)}
                                     alt={section.title}
@@ -323,7 +323,7 @@ export default function SituacaoHidricaPage() {
                                   />
                                 </div>
                               )}
-                              <div className="max-w-none">
+                              <div className="max-w-none overflow-hidden">
                                 {renderContent(section.content)}
                               </div>
                               {children.length > 0 && (

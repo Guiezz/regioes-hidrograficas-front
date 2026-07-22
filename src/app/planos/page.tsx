@@ -188,7 +188,7 @@ export default function PlanosAcaoPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 px-6 items-end">
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-7xl font-bold text-slate-900 tracking-tight leading-none">
+              <h1               className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Plano de Ações
               </h1>
               <div className="flex items-center gap-2 text-slate-400">

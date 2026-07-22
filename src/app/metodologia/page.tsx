@@ -122,7 +122,7 @@ export default function MetodologiaPage() {
               </div>
 
               <div className="space-y-6">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[1.1]">
+                <h1 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                   Metodologia Aplicada
                 </h1>
                 <div className="flex items-center gap-2 text-slate-500 font-medium bg-slate-100 w-fit px-4 py-2 rounded-full">

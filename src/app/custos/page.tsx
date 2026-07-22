@@ -196,7 +196,7 @@ export default function CustosPage() {
               className="anim-fade-up mb-10"
               style={{ animationDelay: "80ms" }}
             >
-              <h1 className="text-4xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
+              <h1               className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Custos do Plano
               </h1>
               <div className="flex items-center gap-2 text-slate-400 mt-4">

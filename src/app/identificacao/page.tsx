@@ -95,7 +95,7 @@ export default function IdentificacaoPage() {
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 tracking-tight leading-none">
+            <h1                 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               {mainTitle ? mainTitle.title : "Identificação da Região"}
             </h1>
             <div className="flex items-center gap-2 text-slate-400">
