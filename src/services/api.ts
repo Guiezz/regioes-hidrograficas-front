@@ -161,4 +161,27 @@ export const getCustos = async (
   }
 };
 
+export interface KPIItem {
+  id: number;
+  basin_id: number;
+  tab: string;
+  view_mode: string;
+  value: string;
+  unit: string;
+  label: string;
+  sublabel: string;
+  icon: string;
+  severity: string;
+  order: number;
+}
+
+export type KPIResponse = Record<string, Record<string, KPIItem[]>>;
+
+export async function getKpis(basinId = 1) {
+  const res = await api.get<KPIResponse>("/kpis", {
+    params: { basin_id: basinId },
+  });
+  return res.data;
+}
+
 export default api;

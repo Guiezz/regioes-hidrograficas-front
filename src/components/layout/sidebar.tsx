@@ -9,12 +9,10 @@ import {
   TableProperties,
   Droplets,
   Workflow,
-  Building2,
   Activity,
-  Waves,
-  Scale,
   ClipboardList,
   Coins,
+  AreaChart,
 } from "lucide-react";
 
 const routes = [
@@ -31,28 +29,10 @@ const routes = [
     color: "text-emerald-500",
   },
   {
-    label: "Infraestrutura Hídrica",
-    icon: Building2,
-    href: "/infraestrutura",
-    color: "text-amber-600",
-  },
-  {
-    label: "Demanda Hídrica",
-    icon: Activity,
-    href: "/demandas",
-    color: "text-rose-600",
-  },
-  {
-    label: "Oferta Hídrica",
-    icon: Waves,
-    href: "/oferta",
-    color: "text-cyan-600",
-  },
-  {
-    label: "Balanço Hídrico",
-    icon: Scale,
-    href: "/balanco",
-    color: "text-blue-700",
+    label: "Situação Hídrica",
+    icon: AreaChart,
+    href: "/situacao-hidrica",
+    color: "text-indigo-600",
   },
   {
     label: "Matriz de Ação",
