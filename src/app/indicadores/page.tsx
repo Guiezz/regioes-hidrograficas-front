@@ -93,7 +93,7 @@ export default function IndicadoresPage() {
   return (
     <div className="min-h-screen bg-white selection:bg-violet-100 selection:text-violet-900">
       {/* Respiro lateral ajustado com px-6 md:px-8 */}
-      <div className="max-w-7xl mx-auto px-6 md:px-8 py-20 lg:py-32">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         {/* HEADER */}
         <header className="mb-16 space-y-8">
           <Badge
@@ -105,7 +105,7 @@ export default function IndicadoresPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-none">
+              <h1               className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Indicadores de Execução
               </h1>
               <div className="flex items-center gap-2 text-slate-400">
@@ -252,8 +252,8 @@ export default function IndicadoresPage() {
           </div>
         </div>
 
-        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4 text-center">
-          <div className="w-2 h-2 rounded-full bg-violet-400" />
+        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
+          <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
       </div>
     </div>

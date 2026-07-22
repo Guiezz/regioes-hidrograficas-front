@@ -108,10 +108,10 @@ export default function MetodologiaPage() {
   const level2Sections = sections.filter((s) => s.level === 2);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 selection:bg-sky-100 selection:text-sky-900 pb-24">
+    <div className="min-h-screen bg-white selection:bg-sky-100 selection:text-sky-900 pb-24">
       {/* Hero Section */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 py-20 lg:py-28">
+        <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="flex items-center gap-4">
@@ -122,7 +122,7 @@ export default function MetodologiaPage() {
               </div>
 
               <div className="space-y-6">
-                <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 tracking-tight leading-[1.1]">
+                <h1 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                   Metodologia Aplicada
                 </h1>
                 <div className="flex items-center gap-2 text-slate-500 font-medium bg-slate-100 w-fit px-4 py-2 rounded-full">
@@ -136,7 +136,7 @@ export default function MetodologiaPage() {
               </div>
 
               {mainTitle?.content && (
-                <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed">
+                <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed text-justify">
                   {getFirstParagraph(mainTitle.content)}
                 </p>
               )}
@@ -168,7 +168,7 @@ export default function MetodologiaPage() {
       </div>
 
       {/* Conteúdo Intercalado (Zig-Zag) */}
-      <div className="max-w-6xl mx-auto px-6 mt-20 space-y-32">
+      <div className="max-w-5xl mx-auto px-6 mt-20 space-y-32">
         {level2Sections.map((mainSection, index) => {
           const isEven = index % 2 === 0;
           const hasRealImage = !!mainSection.image;
@@ -230,7 +230,7 @@ export default function MetodologiaPage() {
                 </div>
 
                 <div className="prose prose-slate prose-lg">
-                  <p className="text-slate-600 leading-[1.8] font-light text-[1.1rem]">
+                  <p className="text-slate-600 leading-[1.8] font-light text-[1.1rem] text-justify">
                     {getSmartSummary(mainSection, subSections)}
                   </p>
                 </div>
@@ -315,6 +315,10 @@ export default function MetodologiaPage() {
           );
         })}
       </div>
+
+      <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
+        <div className="w-2 h-2 rounded-full bg-sky-500" />
+      </footer>
     </div>
   );
 }

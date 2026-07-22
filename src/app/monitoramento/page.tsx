@@ -175,7 +175,7 @@ export default function MonitoramentoPage() {
 
   return (
     <div className="min-h-screen bg-white selection:bg-emerald-100 selection:text-emerald-900">
-      <div className="max-w-7xl mx-auto md:px-8 py-20 lg:py-32">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         <header className="mb-16 space-y-8 px-6">
           <Badge
             variant="outline"
@@ -186,7 +186,7 @@ export default function MonitoramentoPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
             <div className="space-y-4">
-              <h1 className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight">
+              <h1               className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Monitoramento
               </h1>
               <div className="flex items-center gap-2 text-slate-400">
@@ -435,7 +435,7 @@ export default function MonitoramentoPage() {
             </div>
           </div>
         </div>
-        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4 text-center">
+        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
       </div>

@@ -85,8 +85,8 @@ export default function IdentificacaoPage() {
 
   return (
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
-      <div className="max-w-4xl mx-auto px-6 py-20 lg:py-32">
-        <header className="mb-24 space-y-8">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
+        <header className="mb-16 space-y-8">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
@@ -95,7 +95,7 @@ export default function IdentificacaoPage() {
           </div>
 
           <div className="space-y-4">
-            <h1 className="text-5xl md:text-6xl font-bold text-slate-900 tracking-tight leading-none">
+            <h1                 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               {mainTitle ? mainTitle.title : "Identificação da Região"}
             </h1>
             <div className="flex items-center gap-2 text-slate-400">
@@ -157,9 +157,8 @@ export default function IdentificacaoPage() {
           ))}
         </div>
 
-        <footer className="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400"></p>
+        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
+          <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
       </div>
     </div>
