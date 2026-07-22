@@ -379,7 +379,6 @@ export default function SituacaoHidricaPage() {
 
         <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400" />
         </footer>
       </div>
     </div>

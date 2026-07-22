@@ -435,7 +435,7 @@ export default function MonitoramentoPage() {
             </div>
           </div>
         </div>
-        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4 text-center">
+        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
       </div>

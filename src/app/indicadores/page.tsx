@@ -252,8 +252,8 @@ export default function IndicadoresPage() {
           </div>
         </div>
 
-        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4 text-center">
-          <div className="w-2 h-2 rounded-full bg-violet-400" />
+        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
+          <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
       </div>
     </div>

@@ -157,9 +157,8 @@ export default function IdentificacaoPage() {
           ))}
         </div>
 
-        <footer className="mt-10 pt-8 border-t border-slate-100 flex flex-col items-center gap-4">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-slate-400"></p>
+        <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
+          <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
       </div>
     </div>
