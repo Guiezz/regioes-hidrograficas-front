@@ -136,7 +136,7 @@ export default function MetodologiaPage() {
               </div>
 
               {mainTitle?.content && (
-                <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed">
+                <p className="text-lg md:text-xl text-slate-600 font-light leading-relaxed text-justify">
                   {getFirstParagraph(mainTitle.content)}
                 </p>
               )}
@@ -230,7 +230,7 @@ export default function MetodologiaPage() {
                 </div>
 
                 <div className="prose prose-slate prose-lg">
-                  <p className="text-slate-600 leading-[1.8] font-light text-[1.1rem]">
+                  <p className="text-slate-600 leading-[1.8] font-light text-[1.1rem] text-justify">
                     {getSmartSummary(mainSection, subSections)}
                   </p>
                 </div>
