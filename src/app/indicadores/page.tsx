@@ -93,7 +93,7 @@ export default function IndicadoresPage() {
   return (
     <div className="min-h-screen bg-white selection:bg-violet-100 selection:text-violet-900">
       {/* Respiro lateral ajustado com px-6 md:px-8 */}
-      <div className="max-w-7xl mx-auto px-6 md:px-8 py-20 lg:py-32">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         {/* HEADER */}
         <header className="mb-16 space-y-8">
           <Badge

@@ -85,8 +85,8 @@ export default function IdentificacaoPage() {
 
   return (
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
-      <div className="max-w-4xl mx-auto px-6 py-20 lg:py-32">
-        <header className="mb-24 space-y-8">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
+        <header className="mb-16 space-y-8">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">

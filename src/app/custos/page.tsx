@@ -171,11 +171,11 @@ export default function CustosPage() {
     <>
       <style>{globalStyles}</style>
 
-      <div className="min-h-screen bg-[#fafafa] selection:bg-sky-100 selection:text-sky-900">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-10 py-12 lg:py-24">
+      <div className="min-h-screen bg-white selection:bg-sky-100 selection:text-sky-900">
+        <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
           {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
           <header
-            className={`mb-20 transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`}
+            className={`mb-16 transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`}
           >
             {/* Eyebrow */}
             <div
@@ -483,8 +483,7 @@ export default function CustosPage() {
 
           {/* ══ FOOTER ══════════════════════════════════════════════════════════ */}
           <footer
-            className="mt-28 pt-10 border-t border-slate-100
-                             flex flex-col sm:flex-row items-center justify-between gap-4"
+            className="mt-20 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4"
           >
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-1.5 rounded-full bg-sky-400 animate-pulse" />

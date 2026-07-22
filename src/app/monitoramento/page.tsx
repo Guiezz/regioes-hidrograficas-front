@@ -175,7 +175,7 @@ export default function MonitoramentoPage() {
 
   return (
     <div className="min-h-screen bg-white selection:bg-emerald-100 selection:text-emerald-900">
-      <div className="max-w-7xl mx-auto md:px-8 py-20 lg:py-32">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         <header className="mb-16 space-y-8 px-6">
           <Badge
             variant="outline"

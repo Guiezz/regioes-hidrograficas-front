@@ -108,10 +108,10 @@ export default function MetodologiaPage() {
   const level2Sections = sections.filter((s) => s.level === 2);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 selection:bg-sky-100 selection:text-sky-900 pb-24">
+    <div className="min-h-screen bg-white selection:bg-sky-100 selection:text-sky-900 pb-24">
       {/* Hero Section */}
       <div className="bg-white border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-6 py-20 lg:py-28">
+        <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="flex items-center gap-4">
@@ -168,7 +168,7 @@ export default function MetodologiaPage() {
       </div>
 
       {/* Conteúdo Intercalado (Zig-Zag) */}
-      <div className="max-w-6xl mx-auto px-6 mt-20 space-y-32">
+      <div className="max-w-5xl mx-auto px-6 mt-20 space-y-32">
         {level2Sections.map((mainSection, index) => {
           const isEven = index % 2 === 0;
           const hasRealImage = !!mainSection.image;

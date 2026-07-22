@@ -124,9 +124,9 @@ export default function MatrizPage() {
 
   return (
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
-      <div className="max-w-4xl mx-auto px-0 md:px-8 py-20 lg:py-32">
+      <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         {/* Header Editorial */}
-        <header className="mb-20 px-4 space-y-10">
+        <header className="mb-16 space-y-10">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
             <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
