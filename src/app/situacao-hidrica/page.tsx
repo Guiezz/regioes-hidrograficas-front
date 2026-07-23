@@ -8,23 +8,10 @@ import type { KPIItem, KPIResponse } from "@/services/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Loader2,
-  MapPin,
-  Building2,
-  Activity,
-  Waves,
-  Scale,
-  Droplets,
-  CheckCircle2,
-  AlertTriangle,
-  TrendingDown,
-  TrendingUp,
-  Users,
-  Sprout,
-  Factory,
-  Thermometer,
-  Construction,
-  FlaskConical,
-  Minimize2,
+  MapPin, Building2, Activity, Waves, Scale,
+  Droplets, CheckCircle2, AlertTriangle, TrendingDown,
+  TrendingUp, Users, Sprout, Factory, Thermometer,
+  Construction, FlaskConical, Minimize2, Clock,
   type LucideIcon,
 } from "lucide-react";
 
@@ -114,12 +101,32 @@ const SEVERITY_STYLES = {
   },
 };
 
+function abbreviateValue(val: string): string {
+  const clean = val.replace(/\./g, "").replace(",", ".");
+  const num = parseFloat(clean);
+  if (isNaN(num)) return val;
+  const abs = Math.abs(num);
+  if (abs >= 1_000_000_000) return (num / 1_000_000_000).toFixed(2).replace(".", ",") + " bi";
+  if (abs >= 1_000_000) return (num / 1_000_000).toFixed(2).replace(".", ",") + " mi";
+  if (abs >= 1_000) return (num / 1_000).toFixed(1).replace(".", ",") + " mil";
+  return val;
+}
+
 function KpiCard({ kpi }: { kpi: KPIItem }) {
   const styles = SEVERITY_STYLES[kpi.severity as keyof typeof SEVERITY_STYLES] || SEVERITY_STYLES.positive;
   const Icon = ICON_MAP[kpi.icon] || Droplets;
+  const isFuture = kpi.view_mode === "futuro";
+  const displayValue = abbreviateValue(kpi.value);
+  const isAbbreviated = displayValue !== kpi.value;
 
   return (
-    <div className={`rounded-2xl p-5 border overflow-hidden ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border}`}>
+    <div className={`rounded-2xl p-5 border overflow-hidden ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border} relative`}>
+      {isFuture && (
+        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200/60 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+          <Clock className="w-2.5 h-2.5" />
+          Projetado
+        </div>
+      )}
       <div className="flex items-start justify-between mb-3">
         <div className={`p-2 rounded-xl bg-white/80 ${styles.icon}`}>
           <Icon className="w-5 h-5" />
@@ -128,10 +135,13 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
           {kpi.label}
         </span>
       </div>
-      <div className={`text-2xl md:text-3xl font-bold ${styles.value} leading-tight`}>
-        {kpi.value}
-        {kpi.unit && <span className="text-base font-medium ml-1 opacity-80">{kpi.unit}</span>}
+      <div className={`text-2xl md:text-3xl font-bold ${styles.value} leading-tight flex items-baseline gap-2`}>
+        <span>{isAbbreviated ? displayValue : kpi.value}</span>
+        {kpi.unit && <span className="text-base font-medium opacity-80">{kpi.unit}</span>}
       </div>
+      {isAbbreviated && (
+        <p className="text-[10px] text-slate-400 mt-0.5 font-mono">{kpi.value} {kpi.unit}</p>
+      )}
       {kpi.sublabel && (
         <p className="text-xs text-slate-500 mt-2 leading-relaxed">{kpi.sublabel}</p>
       )}
@@ -272,22 +282,51 @@ export default function SituacaoHidricaPage() {
               onValueChange={(v) => setActiveTab(v as TabKey)}
             >
               {(Object.keys(TAB_CONFIG) as TabKey[]).map((tabKey) => {
-                const kpiList = [
-                  ...(kpis[tabKey]?.atual || []),
-                  ...(kpis[tabKey]?.futuro || []),
-                ];
+                const atualKpis = kpis[tabKey]?.atual || [];
+                const futuroKpis = kpis[tabKey]?.futuro || [];
+                const hasBoth = atualKpis.length > 0 && futuroKpis.length > 0;
                 return (
                   <TabsContent
                     key={tabKey}
                     value={tabKey}
                     className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700 focus-visible:outline-none"
                   >
-                    {kpiList.length > 0 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {kpiList.map((kpi) => (
-                          <KpiCard key={kpi.id} kpi={kpi} />
-                        ))}
-                      </div>
+                    {atualKpis.length > 0 && (
+                      <section className="space-y-6">
+                        {hasBoth && (
+                          <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-slate-100" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                              Situação Atual
+                            </span>
+                            <div className="h-px flex-1 bg-slate-100" />
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {atualKpis.map((kpi) => (
+                            <KpiCard key={kpi.id} kpi={kpi} />
+                          ))}
+                        </div>
+                      </section>
+                    )}
+
+                    {futuroKpis.length > 0 && (
+                      <section className="space-y-6">
+                        {hasBoth && (
+                          <div className="flex items-center gap-3">
+                            <div className="h-px flex-1 bg-slate-100" />
+                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                              Expansão Prevista
+                            </span>
+                            <div className="h-px flex-1 bg-slate-100" />
+                          </div>
+                        )}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                          {futuroKpis.map((kpi) => (
+                            <KpiCard key={kpi.id} kpi={kpi} />
+                          ))}
+                        </div>
+                      </section>
                     )}
 
                     {mainTitle?.content && (
