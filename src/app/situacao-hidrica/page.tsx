@@ -120,9 +120,9 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
   const isAbbreviated = displayValue !== kpi.value;
 
   return (
-    <div className={`rounded-2xl p-5 border overflow-hidden ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border} relative`}>
+    <div className={`rounded-2xl p-5 border overflow-hidden ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border}`}>
       {isFuture && (
-        <div className="absolute top-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded-full bg-slate-200/60 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+        <div className="mb-3 flex items-center gap-1.5 px-2 py-1 w-fit rounded-full bg-slate-200/60 text-[9px] font-bold uppercase tracking-wider text-slate-500">
           <Clock className="w-2.5 h-2.5" />
           Projetado
         </div>
@@ -289,7 +289,7 @@ export default function SituacaoHidricaPage() {
                   <TabsContent
                     key={tabKey}
                     value={tabKey}
-                    className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700 focus-visible:outline-none"
+                    className="space-y-20 animate-in fade-in slide-in-from-bottom-4 duration-700 focus-visible:outline-none"
                   >
                     {atualKpis.length > 0 && (
                       <section className="space-y-6">
