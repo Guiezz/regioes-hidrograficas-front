@@ -258,7 +258,7 @@ export default function SituacaoHidricaPage() {
                   value={activeTab}
                   onValueChange={(v) => setActiveTab(v as TabKey)}
                 >
-                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
+                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
                     {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
                       ([key, cfg]) => (
                         <TabsTrigger
