@@ -258,13 +258,13 @@ export default function SituacaoHidricaPage() {
                   value={activeTab}
                   onValueChange={(v) => setActiveTab(v as TabKey)}
                 >
-                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm h-auto min-h-12 inline-flex flex-wrap w-full gap-1">
+                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
                     {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
                       ([key, cfg]) => (
                         <TabsTrigger
                           key={key}
                           value={key}
-                          className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center gap-1.5 shrink-0"
+                          className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
                         >
                           <cfg.icon className="w-3.5 h-3.5" />
                           <span className="hidden md:inline">{cfg.label}</span>
@@ -289,7 +289,7 @@ export default function SituacaoHidricaPage() {
                   <TabsContent
                     key={tabKey}
                     value={tabKey}
-                    className="space-y-20 animate-in fade-in slide-in-from-bottom-4 duration-700 focus-visible:outline-none"
+                    className="space-y-24 animate-in fade-in slide-in-from-bottom-4 duration-700 focus-visible:outline-none"
                   >
                     {atualKpis.length > 0 && (
                       <section className="space-y-6">
