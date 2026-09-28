@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
-  LayoutDashboard,
   FileText,
   TableProperties,
   Droplets,
@@ -53,13 +52,7 @@ const routes = [
     color: "text-green-500",
   },
   {
-    label: "Indicadores",
-    icon: LayoutDashboard,
-    href: "/indicadores",
-    color: "text-violet-500",
-  },
-  {
-    label: "Custos",
+    label: "Previsão de Custos",
     icon: Coins,
     href: "/custos",
     color: "text-yellow-500",

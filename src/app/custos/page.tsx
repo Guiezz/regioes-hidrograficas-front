@@ -196,8 +196,8 @@ export default function CustosPage() {
               className="anim-fade-up mb-10"
               style={{ animationDelay: "80ms" }}
             >
-              <h1               className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
-                Custos do Plano
+              <h1 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
+                Previsão de Custos
               </h1>
               <div className="flex items-center gap-2 text-slate-400 mt-4">
                 <MapPin className="w-3.5 h-3.5 text-sky-400 shrink-0" />
@@ -249,6 +249,22 @@ export default function CustosPage() {
                   accent="slate"
                   delay={360}
                 />
+              </div>
+            </div>
+
+            {/* Aviso Informativo / Nota de Esclarecimento */}
+            <div
+              className="anim-fade-up mt-8 flex items-start gap-3.5 rounded-2xl border border-amber-200/70 bg-gradient-to-r from-amber-50/70 via-amber-50/30 to-white p-4 sm:p-5 text-slate-600 shadow-[0_2px_12px_0_rgba(0,0,0,0.03)]"
+              style={{ animationDelay: "420ms" }}
+            >
+              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="text-xs leading-relaxed space-y-0.5">
+                <span className="font-semibold text-slate-800">
+                  Nota sobre os valores apresentados:{" "}
+                </span>
+                <span className="text-slate-600">
+                  Os valores e custos exibidos nesta página são estimativas de caráter especulativo e orientativo, servindo exclusivamente como base referencial para planejamento estratégico e modelagem de cenários. Não constituem valores concretos, fixos ou orçamentos executivos vinculantes, estando sujeitos a revisões periódicas, variações de mercado e detalhamentos técnicos em etapas posteriores.
+                </span>
               </div>
             </div>
           </header>
