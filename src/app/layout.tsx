@@ -8,8 +8,14 @@ import { Suspense } from "react"; // [2] Importar Suspense
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Plano de Recursos Hídricos",
-  description: "Dashboard de Gestão de Recursos Hídricos",
+  title: "SIGRH — Sistema de Informações de Gestão das Regiões Hidrográficas do Ceará",
+  description:
+    "Sistema de Informações de Gestão das Regiões Hidrográficas do Ceará",
+  icons: {
+    icon: "/logos/logo-isolada.svg",
+    shortcut: "/logos/logo-isolada.svg",
+    apple: "/logos/logo-isolada.svg",
+  },
 };
 
 export default function RootLayout({
