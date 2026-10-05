@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useReservoir } from "@/context/ReservoirContext";
+import { getSections } from "@/services/api";
 import {
   Card,
   CardContent,
@@ -21,91 +23,76 @@ import {
   Scale,
   Droplets,
   ArrowRight,
+  MapPin,
+  Loader2,
 } from "lucide-react";
 import { ReservoirSelector } from "@/components/layout/ReservoirSelector";
 
-interface BasinPhotoInfo {
-  image: string;
-  reservoirName: string;
+interface BasinMapInfo {
+  url: string;
+  title: string;
+  number: string;
 }
 
-const BASIN_PHOTOS: Record<string, BasinPhotoInfo> = {
-  "alto jaguaribe": {
-    image: "/images/reservatorios/vista_trussu.jpeg",
-    reservoirName: "Açude Trussu",
-  },
-  "baixo jaguaribe": {
-    image: "/images/reservatorios/vista_castro.jpg",
-    reservoirName: "Açude Castanhão / Vale",
-  },
-  "banabuiu": {
-    image: "/images/reservatorios/vista_fogareiro.jpg",
-    reservoirName: "Açude Fogareiro",
-  },
-  "crateus": {
-    image: "/images/reservatorios/vista_carnaubal.jpg",
-    reservoirName: "Açude Carnaubal",
-  },
-  "coreau": {
-    image: "/images/reservatorios/vista_missi.jpeg",
-    reservoirName: "Açude Missi",
-  },
-  "curu": {
-    image: "/images/reservatorios/vista_tejuçuoca.jpg",
-    reservoirName: "Açude Tejuçuoca",
-  },
-  "ibiapaba": {
-    image: "/images/reservatorios/vista_jaburu.jpg",
-    reservoirName: "Açude Jaburu I",
-  },
-  "litoral": {
-    image: "/images/reservatorios/vsita_acarape.jpeg",
-    reservoirName: "Açude Acarape do Meio",
-  },
-  "medio jaguaribe": {
-    image: "/images/reservatorios/vista_ubaldinho.jpg",
-    reservoirName: "Açude Ubaldinho",
-  },
-  "metropolitana": {
-    image: "/images/reservatorios/vista_pesqueiro.jpeg",
-    reservoirName: "Sistemas Metropolitanos / Pesqueiro",
-  },
-  "salgado": {
-    image: "/images/reservatorios/vista_cachoeira.jpg",
-    reservoirName: "Açude Cachoeira",
-  },
-};
-
-function normalizeKey(str: string): string {
-  return str
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
-}
-
-function getBasinPhoto(name?: string): BasinPhotoInfo {
-  if (!name) {
-    return {
-      image: "/images/reservatorios/hero_acude.jpg",
-      reservoirName: "Monitoramento e Segurança Hídrica",
-    };
-  }
-  const norm = normalizeKey(name);
-  for (const [key, val] of Object.entries(BASIN_PHOTOS)) {
-    if (norm.includes(key) || key.includes(norm)) {
-      return val;
-    }
-  }
-  return {
-    image: "/images/reservatorios/hero_acude.jpg",
-    reservoirName: "Monitoramento e Segurança Hídrica",
-  };
+function getImageUrl(imagePath?: string): string {
+  if (!imagePath) return "";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") ||
+    "http://localhost:8080";
+  const cleanPath = imagePath.startsWith("/") ? imagePath : `/${imagePath}`;
+  return `${baseUrl}${cleanPath}`;
 }
 
 export default function HomePage() {
   const { selectedReservoir } = useReservoir();
-  const basinPhoto = getBasinPhoto(selectedReservoir?.name);
+  const [selectedMapType, setSelectedMapType] = useState<"1.2" | "1.3">("1.2");
+  const [map12, setMap12] = useState<BasinMapInfo | null>(null);
+  const [map13, setMap13] = useState<BasinMapInfo | null>(null);
+  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function fetchBasinMaps() {
+      if (!selectedReservoir?.id) return;
+      setIsLoadingMap(true);
+      try {
+        const sections = await getSections(selectedReservoir.id);
+        const sec12 = sections.find(
+          (s: { number: string; image?: string; title: string }) =>
+            s.number === "1.2" && s.image,
+        );
+        const sec13 = sections.find(
+          (s: { number: string; image?: string; title: string }) =>
+            s.number === "1.3" && s.image,
+        );
+
+        setMap12(
+          sec12
+            ? {
+                url: getImageUrl(sec12.image),
+                title: sec12.title,
+                number: sec12.number,
+              }
+            : null,
+        );
+        setMap13(
+          sec13
+            ? {
+                url: getImageUrl(sec13.image),
+                title: sec13.title,
+                number: sec13.number,
+              }
+            : null,
+        );
+      } catch (err) {
+        console.error("Erro ao carregar mapas da identificação:", err);
+      } finally {
+        setIsLoadingMap(false);
+      }
+    }
+    fetchBasinMaps();
+  }, [selectedReservoir?.id]);
+
+  const activeMap = selectedMapType === "1.3" && map13 ? map13 : map12 || map13;
 
   return (
     <main className="flex flex-col bg-background">
@@ -181,42 +168,97 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Coluna da Direita - Card Fotográfico Moderno e Dinâmico */}
-          <div className="flex-1 w-full lg:max-w-md xl:max-w-lg flex justify-center items-center animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms]">
-            <div className="relative w-full rounded-2xl overflow-hidden border border-border/60 bg-card shadow-2xl shadow-primary/10 group">
-              <div className="relative aspect-[4/3] w-full overflow-hidden">
-                <Image
-                  key={basinPhoto.image}
-                  src={basinPhoto.image}
-                  alt={basinPhoto.reservoirName}
-                  fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 480px"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                  priority
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/25 to-transparent pointer-events-none" />
+          {/* Coluna da Direita - Card com Mapa Oficial de Identificação da API */}
+          <div className="flex-1 w-full lg:max-w-md xl:max-w-xl flex justify-center items-center animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms]">
+            <div className="relative w-full rounded-2xl overflow-hidden border border-[#005384]/20 bg-white shadow-xl shadow-blue-900/10 group flex flex-col">
+              {/* Barra Superior do Card */}
+              <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-blue-50/50 border-b border-slate-100 flex items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#005384]/10 text-[#005384] border border-[#005384]/20">
+                  <MapPin className="h-3 w-3 text-[#005384]" />
+                  {selectedReservoir?.name
+                    ? `Região ${selectedReservoir.name}`
+                    : "Região Hidrográfica"}
+                </span>
 
-                {/* Badge informativo dinâmico */}
-                <div className="absolute top-4 left-4">
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-slate-950/70 text-sky-300 backdrop-blur-md border border-white/10 shadow-sm">
-                    <Droplets className="h-3.5 w-3.5 text-sky-400" />
-                    {selectedReservoir?.name
-                      ? `Região ${selectedReservoir.name}`
-                      : "Região Hidrográfica do Ceará"}
-                  </span>
+                {/* Seletores de Mapa: Caracterização (1.2) vs Infraestrutura (1.3) */}
+                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedMapType("1.2")}
+                    className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                      selectedMapType === "1.2"
+                        ? "bg-[#005384] text-white shadow-xs"
+                        : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
+                    }`}
+                  >
+                    Caracterização
+                  </button>
+                  {map13 && (
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMapType("1.3")}
+                      className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                        selectedMapType === "1.3"
+                          ? "bg-[#005384] text-white shadow-xs"
+                          : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
+                      }`}
+                    >
+                      Infraestrutura
+                    </button>
+                  )}
                 </div>
+              </div>
 
-                {/* Legenda institucional dinâmica no rodapé do card */}
-                <div className="absolute bottom-4 left-4 right-4 text-white">
-                  <p className="text-sm font-semibold tracking-tight text-white drop-shadow-sm">
-                    {basinPhoto.reservoirName}
+              {/* Área da Imagem / Mapa */}
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-50 flex items-center justify-center p-2">
+                {isLoadingMap ? (
+                  <div className="flex flex-col items-center gap-2 text-slate-400">
+                    <Loader2 className="h-6 w-6 animate-spin text-[#005384]" />
+                    <span className="text-xs font-medium">Carregando mapa técnico...</span>
+                  </div>
+                ) : activeMap?.url ? (
+                  <Image
+                    key={activeMap.url}
+                    src={activeMap.url}
+                    alt={activeMap.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 540px"
+                    className="object-contain p-2 transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                    unoptimized
+                    priority
+                  />
+                ) : (
+                  <div className="flex flex-col items-center gap-2 text-slate-400">
+                    <Droplets className="h-8 w-8 text-[#005384]/40" />
+                    <span className="text-xs">Mapa não disponível</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Rodapé Informativo com Link para Identificação */}
+              <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between gap-3">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-semibold text-[#005384] leading-tight">
+                    {activeMap?.title || "Mapa da Região Hidrográfica"}
                   </p>
-                  <p className="text-xs text-slate-200/90 drop-shadow-sm">
+                  <p className="text-xs text-[#2b5278]/80">
                     {selectedReservoir?.name
-                      ? `Bacia Hidrográfica do ${selectedReservoir.name}`
-                      : "Acompanhamento integrado de infraestruturas e reservatórios"}
+                      ? `Bacia Hidrográfica do ${selectedReservoir.name} • Acervo SIGRH`
+                      : "Dados biofísicos e cartográficos oficiais"}
                   </p>
                 </div>
+                <Link
+                  href={
+                    selectedReservoir?.id
+                      ? `/identificacao?basin_id=${selectedReservoir.id}`
+                      : "/identificacao"
+                  }
+                  className="shrink-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
+                  title="Ver seção completa de Identificação"
+                >
+                  Identificação
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
               </div>
             </div>
           </div>
