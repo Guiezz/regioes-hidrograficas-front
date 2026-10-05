@@ -20,7 +20,7 @@ export default function MobileSidebar() {
         </Button>
       </SheetTrigger>
 
-      <SheetContent side="left" className="p-0 bg-slate-900 border-none w-72">
+      <SheetContent side="left" className="p-0 bg-[#07182d] border-none w-72">
         <SheetTitle className="sr-only">Menu de Navegação</SheetTitle>
 
         <Sidebar isMobile={true} />

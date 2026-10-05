@@ -1,61 +1,86 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import {
+  Home,
   FileText,
-  TableProperties,
-  Droplets,
   Workflow,
-  Activity,
-  ClipboardList,
-  Coins,
   AreaChart,
+  TableProperties,
+  ClipboardList,
+  Activity,
+  Coins,
 } from "lucide-react";
 
-const routes = [
+interface NavigationItem {
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  href: string;
+}
+
+interface NavigationGroup {
+  title: string | null;
+  items: NavigationItem[];
+}
+
+const navigationGroups: NavigationGroup[] = [
   {
-    label: "Identificação",
-    icon: FileText,
-    href: "/identificacao",
-    color: "text-violet-500",
+    title: null,
+    items: [
+      {
+        label: "Início",
+        icon: Home,
+        href: "/",
+      },
+    ],
   },
   {
-    label: "Metodologia",
-    icon: Workflow,
-    href: "/metodologia",
-    color: "text-emerald-500",
+    title: "Contexto",
+    items: [
+      {
+        label: "Identificação",
+        icon: FileText,
+        href: "/identificacao",
+      },
+      {
+        label: "Metodologia",
+        icon: Workflow,
+        href: "/metodologia",
+      },
+      {
+        label: "Situação Hídrica",
+        icon: AreaChart,
+        href: "/situacao-hidrica",
+      },
+    ],
   },
   {
-    label: "Situação Hídrica",
-    icon: AreaChart,
-    href: "/situacao-hidrica",
-    color: "text-indigo-600",
-  },
-  {
-    label: "Matriz de Ação",
-    icon: TableProperties,
-    href: "/matriz",
-    color: "text-pink-700",
-  },
-  {
-    label: "Planos de Ação",
-    icon: ClipboardList,
-    href: "/planos",
-    color: "text-cyan-600",
-  },
-  {
-    label: "Monitoramento",
-    icon: Activity,
-    href: "/monitoramento",
-    color: "text-green-500",
-  },
-  {
-    label: "Previsão de Custos",
-    icon: Coins,
-    href: "/custos",
-    color: "text-yellow-500",
+    title: "Planejamento",
+    items: [
+      {
+        label: "Matriz de Ação",
+        icon: TableProperties,
+        href: "/matriz",
+      },
+      {
+        label: "Planos de Ação",
+        icon: ClipboardList,
+        href: "/planos",
+      },
+      {
+        label: "Monitoramento",
+        icon: Activity,
+        href: "/monitoramento",
+      },
+      {
+        label: "Previsão de Custos",
+        icon: Coins,
+        href: "/custos",
+      },
+    ],
   },
 ];
 
@@ -73,69 +98,112 @@ export function Sidebar({
   const pathname = usePathname();
 
   return (
-    <div
+    <aside
+      style={{
+        background: "linear-gradient(to bottom, #07182d, #092640)",
+      }}
       className={cn(
-        "space-y-4 py-4 flex flex-col h-full bg-slate-900 text-white transition-all duration-300",
+        "flex flex-col h-full text-[#d9e8f7] border-r border-white/10 transition-all duration-300 py-4 px-3 select-none",
         className,
       )}
     >
-      <div className="px-3 py-2 flex-1">
-        {/* LOGO */}
-        <Link
-          href="/"
-          className={cn(
-            "flex items-center mb-14 transition-all",
-            collapsed && !isMobile ? "justify-center pl-0" : "pl-3",
-          )}
-          title="Sistema de Informações de Gestão de Recursos Hídricos" // Nome completo ao passar o mouse
-        >
-          <div className="relative h-8 w-8">
-            <Droplets className="h-8 w-8 text-blue-400" />
-          </div>
-          {/* Esconde o texto se estiver colapsado (e não for mobile) */}
-          {(!collapsed || isMobile) && (
-            <div className="flex flex-col ml-4 transition-opacity duration-300">
-              <h1 className="text-2xl font-bold whitespace-nowrap leading-none">
-                SIG<span className="text-blue-400">RH</span>
-              </h1>
-              <span className="text-[9px] text-zinc-400 uppercase tracking-widest font-medium mt-1">
-                Sistema de Informações de Gestão das Regiões Hidrográficas
-              </span>
+      {/* ─── MARCA / LOGO NO TOPO ─── */}
+      <div className="mb-6 px-1">
+        {collapsed && !isMobile ? (
+          <Link
+            href="/"
+            className="flex items-center justify-center transition-all group py-1"
+            title="SIGRH — Sistema de Informações de Gestão das Regiões Hidrográficas do Ceará"
+          >
+            <div className="relative h-8 w-12 flex items-center justify-center">
+              <Image
+                src="/logos/logo-isolada.svg"
+                alt="Ícone SIGRH"
+                fill
+                className="object-contain group-hover:scale-105 transition-transform"
+                priority
+              />
             </div>
-          )}
-        </Link>
-
-        {/* MENU */}
-        <div className="space-y-1">
-          {routes.map((route) => (
-            <Link
-              key={route.href}
-              href={route.href}
-              className={cn(
-                "text-sm group flex p-3 w-full font-medium cursor-pointer hover:text-white hover:bg-white/10 rounded-lg transition-all",
-                pathname === route.href
-                  ? "text-white bg-white/10"
-                  : "text-zinc-400",
-                collapsed && !isMobile ? "justify-center" : "justify-start",
-              )}
-              title={collapsed ? route.label : undefined}
-            >
-              <div className="flex items-center">
-                <route.icon
-                  className={cn(
-                    "h-5 w-5",
-                    route.color,
-                    !collapsed || isMobile ? "mr-3" : "mr-0",
-                  )}
+          </Link>
+        ) : (
+          <Link
+            href="/"
+            className="flex flex-col items-start transition-all group px-2 py-1"
+            title="SIGRH — Sistema de Informações de Gestão das Regiões Hidrográficas do Ceará"
+          >
+            <div className="flex items-center gap-3">
+              <div className="relative h-8 w-12 shrink-0">
+                <Image
+                  src="/logos/logo-isolada.svg"
+                  alt="Ícone SIGRH"
+                  fill
+                  className="object-contain group-hover:scale-105 transition-transform"
+                  priority
                 />
-                {(!collapsed || isMobile) && (
-                  <span className="truncate">{route.label}</span>
-                )}
               </div>
-            </Link>
-          ))}
-        </div>
+              <b className="text-2xl font-bold tracking-tight text-white">
+                SIGRH
+              </b>
+            </div>
+            <small className="block text-xs text-[#b8d1ea] font-medium leading-snug mt-2">
+              Sistema de Informações de Gestão<br />das Regiões Hidrográficas do Ceará
+            </small>
+          </Link>
+        )}
       </div>
-    </div>
+
+      {/* ─── NAVEGAÇÃO ORGANIZADA EM GRUPOS ─── */}
+      <div className="flex-1 space-y-4 overflow-y-auto scrollbar-hide">
+        {navigationGroups.map((group, gIdx) => (
+          <div key={group.title || `group-${gIdx}`} className="space-y-1">
+            {group.title && (!collapsed || isMobile) && (
+              <div className="text-[10px] uppercase tracking-wider text-[#7692ac] px-3 pt-3 pb-1 font-semibold">
+                {group.title}
+              </div>
+            )}
+            {group.title && collapsed && !isMobile && (
+              <div className="h-px bg-white/10 mx-2 my-2" />
+            )}
+
+            {group.items.map((item) => {
+              const isActive =
+                item.href === "/"
+                  ? pathname === "/"
+                  : pathname === item.href || pathname.startsWith(item.href + "/");
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "text-sm group flex p-2.5 w-full font-medium cursor-pointer rounded-lg transition-all",
+                    isActive
+                      ? "bg-[#075181] text-white shadow-sm font-semibold"
+                      : "text-[#d9e8f7] hover:bg-white/10 hover:text-white",
+                    collapsed && !isMobile ? "justify-center" : "justify-start",
+                  )}
+                  title={collapsed ? item.label : undefined}
+                >
+                  <div className="flex items-center">
+                    <item.icon
+                      className={cn(
+                        "h-5 w-5 shrink-0",
+                        isActive
+                          ? "text-white"
+                          : "text-[#a2bdd5] group-hover:text-white transition-colors",
+                        !collapsed || isMobile ? "mr-3" : "mr-0",
+                      )}
+                    />
+                    {(!collapsed || isMobile) && (
+                      <span className="truncate">{item.label}</span>
+                    )}
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </aside>
   );
 }

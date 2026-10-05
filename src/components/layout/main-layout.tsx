@@ -27,7 +27,7 @@ export default function MainLayout({
       {/* --- SIDEBAR DESKTOP (Fixa) --- */}
       <div
         className={cn(
-          "hidden md:flex md:flex-col md:fixed md:inset-y-0 z-80 bg-slate-900 transition-all duration-300 ease-in-out",
+          "hidden md:flex md:flex-col md:fixed md:inset-y-0 z-80 bg-[#07182d] transition-all duration-300 ease-in-out",
           isSidebarOpen ? "w-72" : "w-20",
         )}
       >
