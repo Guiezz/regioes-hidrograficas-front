@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getActions } from "@/services/api";
 import axios from "axios";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -66,7 +67,10 @@ export default function MonitoramentoPage() {
 
   useEffect(() => {
     async function loadInitialData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       const baseUrl =
@@ -171,6 +175,10 @@ export default function MonitoramentoPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Monitoramento" />;
   }
 
   return (
