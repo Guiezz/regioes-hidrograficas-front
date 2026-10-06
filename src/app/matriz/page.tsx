@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getMatriz } from "@/services/api";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import {
   Table,
   TableBody,
@@ -46,7 +47,10 @@ export default function MatrizPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       try {
@@ -120,6 +124,10 @@ export default function MatrizPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Matriz de Ação" />;
   }
 
   return (

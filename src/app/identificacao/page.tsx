@@ -5,6 +5,7 @@ import { useReservoir } from "@/context/ReservoirContext";
 import Image from "next/image";
 import { getSections } from "@/services/api";
 import { Loader2, MapPin, Anchor } from "lucide-react";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 
 interface Section {
   id: number;
@@ -23,7 +24,10 @@ export default function IdentificacaoPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       try {
@@ -78,6 +82,10 @@ export default function IdentificacaoPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Identificação" />;
   }
 
   const mainTitle = sections.find((s) => s.level === 1);

@@ -25,6 +25,7 @@ import {
   ArrowRight,
   MapPin,
   Loader2,
+  Info,
 } from "lucide-react";
 import { ReservoirSelector } from "@/components/layout/ReservoirSelector";
 
@@ -48,11 +49,16 @@ export default function HomePage() {
   const [selectedMapType, setSelectedMapType] = useState<"1.2" | "1.3">("1.2");
   const [map12, setMap12] = useState<BasinMapInfo | null>(null);
   const [map13, setMap13] = useState<BasinMapInfo | null>(null);
-  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(true);
+  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchBasinMaps() {
-      if (!selectedReservoir?.id) return;
+      if (!selectedReservoir?.id) {
+        setMap12(null);
+        setMap13(null);
+        setIsLoadingMap(false);
+        return;
+      }
       setIsLoadingMap(true);
       try {
         const sections = await getSections(selectedReservoir.id);
@@ -130,19 +136,29 @@ export default function HomePage() {
             </p>
 
             {/* Bloco de Seleção (Glass card) */}
-            <div className="bg-card/70 backdrop-blur-sm border border-border/40 rounded-xl p-6 shadow-sm w-full animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:150ms]">
+            <div className="bg-card/70 backdrop-blur-sm border border-border/40 rounded-xl p-6 shadow-sm w-full space-y-3 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:150ms]">
               <div className="space-y-1">
                 <h3 className="font-semibold text-foreground flex items-center gap-2">
                   <Droplets className="h-4 w-4 text-primary" />
                   Qual região hidrográfica você deseja analisar?
                 </h3>
                 <p className="text-sm text-[#2b5278]">
-                  Selecione para navegar diretamente aos dados analíticos da região.
+                  Selecione para carregar os dados analíticos, mapas e diagnósticos da região.
                 </p>
               </div>
-              <div className="pt-3">
+
+              <div className="pt-1">
                 <ReservoirSelector fullWidth />
               </div>
+
+              {!selectedReservoir && (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-50 border border-sky-200/80 text-xs text-[#005384] font-medium">
+                  <Info className="h-4 w-4 text-[#0094e0] shrink-0" />
+                  <span>
+                    Por favor, selecione uma região no topo da página ou no campo acima para visualizar os dados completos.
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Ações (CTAs) */}
@@ -152,7 +168,13 @@ export default function HomePage() {
                 asChild
                 className="gap-2 w-full sm:w-auto group bg-[#005384] hover:bg-[#004168] text-white shadow-lg shadow-blue-900/25"
               >
-                <Link href="/situacao-hidrica">
+                <Link
+                  href={
+                    selectedReservoir
+                      ? `/situacao-hidrica?basin_id=${selectedReservoir.id}`
+                      : "/situacao-hidrica"
+                  }
+                >
                   Acessar Situação Hídrica
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
@@ -163,12 +185,20 @@ export default function HomePage() {
                 asChild
                 className="w-full sm:w-auto border-[#005384]/30 text-[#005384] hover:bg-[#005384]/10 hover:text-[#004168]"
               >
-                <Link href="/custos">Ver Previsão de Custos</Link>
+                <Link
+                  href={
+                    selectedReservoir
+                      ? `/custos?basin_id=${selectedReservoir.id}`
+                      : "/custos"
+                  }
+                >
+                  Ver Previsão de Custos
+                </Link>
               </Button>
             </div>
           </div>
 
-          {/* Coluna da Direita - Card com Mapa Oficial de Identificação da API */}
+          {/* Coluna da Direita - Card com Imagem da Bacia ou Capas das 11 Regiões */}
           <div className="flex-1 w-full lg:max-w-md xl:max-w-xl flex justify-center items-center animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms]">
             <div className="relative w-full rounded-2xl overflow-hidden border border-[#005384]/20 bg-white shadow-xl shadow-blue-900/10 group flex flex-col">
               {/* Barra Superior do Card */}
@@ -177,36 +207,42 @@ export default function HomePage() {
                   <MapPin className="h-3 w-3 text-[#005384]" />
                   {selectedReservoir?.name
                     ? `Região ${selectedReservoir.name}`
-                    : "Região Hidrográfica"}
+                    : "Regiões Hidrográficas do Ceará"}
                 </span>
 
-                {/* Seletores de Mapa: Caracterização (1.2) vs Infraestrutura (1.3) */}
-                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedMapType("1.2")}
-                    className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
-                      selectedMapType === "1.2"
-                        ? "bg-[#005384] text-white shadow-xs"
-                        : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
-                    }`}
-                  >
-                    Caracterização
-                  </button>
-                  {map13 && (
+                {/* Seletores de Mapa quando há região selecionada */}
+                {selectedReservoir ? (
+                  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs">
                     <button
                       type="button"
-                      onClick={() => setSelectedMapType("1.3")}
+                      onClick={() => setSelectedMapType("1.2")}
                       className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
-                        selectedMapType === "1.3"
+                        selectedMapType === "1.2"
                           ? "bg-[#005384] text-white shadow-xs"
                           : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
                       }`}
                     >
-                      Infraestrutura
+                      Caracterização
                     </button>
-                  )}
-                </div>
+                    {map13 && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMapType("1.3")}
+                        className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                          selectedMapType === "1.3"
+                            ? "bg-[#005384] text-white shadow-xs"
+                            : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
+                        }`}
+                      >
+                        Infraestrutura
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <span className="text-[11px] font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60">
+                    11 Regiões
+                  </span>
+                )}
               </div>
 
               {/* Área da Imagem / Mapa */}
@@ -216,7 +252,7 @@ export default function HomePage() {
                     <Loader2 className="h-6 w-6 animate-spin text-[#005384]" />
                     <span className="text-xs font-medium">Carregando mapa técnico...</span>
                   </div>
-                ) : activeMap?.url ? (
+                ) : selectedReservoir && activeMap?.url ? (
                   <Image
                     key={activeMap.url}
                     src={activeMap.url}
@@ -228,10 +264,15 @@ export default function HomePage() {
                     priority
                   />
                 ) : (
-                  <div className="flex flex-col items-center gap-2 text-slate-400">
-                    <Droplets className="h-8 w-8 text-[#005384]/40" />
-                    <span className="text-xs">Mapa não disponível</span>
-                  </div>
+                  <Image
+                    src="/logos/capasrh.svg"
+                    alt="Capas dos Planos das Regiões Hidrográficas do Ceará"
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 540px"
+                    className="object-contain p-2 transition-transform duration-500 ease-out group-hover:scale-[1.02]"
+                    unoptimized
+                    priority
+                  />
                 )}
               </div>
 
@@ -239,26 +280,30 @@ export default function HomePage() {
               <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between gap-3">
                 <div className="space-y-0.5">
                   <p className="text-sm font-semibold text-[#005384] leading-tight">
-                    {activeMap?.title || "Mapa da Região Hidrográfica"}
+                    {selectedReservoir
+                      ? activeMap?.title || "Mapa da Região Hidrográfica"
+                      : "Planos das Regiões Hidrográficas do Ceará"}
                   </p>
                   <p className="text-xs text-[#2b5278]/80">
-                    {selectedReservoir?.name
+                    {selectedReservoir
                       ? `Bacia Hidrográfica do ${selectedReservoir.name} • Acervo SIGRH`
-                      : "Dados biofísicos e cartográficos oficiais"}
+                      : "Por favor, selecione uma região no topo da página para visualizar os dados."}
                   </p>
                 </div>
-                <Link
-                  href={
-                    selectedReservoir?.id
-                      ? `/identificacao?basin_id=${selectedReservoir.id}`
-                      : "/identificacao"
-                  }
-                  className="shrink-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
-                  title="Ver seção completa de Identificação"
-                >
-                  Identificação
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </Link>
+                {selectedReservoir ? (
+                  <Link
+                    href={`/identificacao?basin_id=${selectedReservoir.id}`}
+                    className="shrink-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
+                    title="Ver seção completa de Identificação"
+                  >
+                    Identificação
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </Link>
+                ) : (
+                  <span className="shrink-0 text-[11px] font-medium text-slate-400">
+                    Aguardando seleção
+                  </span>
+                )}
               </div>
             </div>
           </div>

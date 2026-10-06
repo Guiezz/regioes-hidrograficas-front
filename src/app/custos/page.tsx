@@ -28,6 +28,7 @@ import {
   TrendingUp,
   Layers,
 } from "lucide-react";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 
 /* ─── Keyframes injetados via <style> ─────────────────────────────────────── */
 const globalStyles = `
@@ -123,7 +124,10 @@ export default function CustosPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       setReady(false);
       try {
@@ -155,6 +159,10 @@ export default function CustosPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Previsão de Custos" />;
   }
 
   if (!data?.planoAcao) {

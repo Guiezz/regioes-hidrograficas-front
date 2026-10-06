@@ -7,7 +7,7 @@ import { getReservoirs, ReservoirData } from "@/services/api"; // Importe a fun�
 interface ReservoirContextType {
   selectedReservoir: ReservoirData | null;
   reservoirs: ReservoirData[];
-  setSelectedReservoir: (reservoir: ReservoirData) => void;
+  setSelectedReservoir: (reservoir: ReservoirData | null) => void;
   isLoading: boolean;
 }
 
@@ -40,12 +40,11 @@ export function ReservoirProvider({ children }: { children: React.ReactNode }) {
           if (found) {
             setSelectedReservoirState(found);
           } else {
-            // ID da URL inválido? Pega o primeiro
-            setSelectedReservoirState(data[0]);
+            setSelectedReservoirState(null);
           }
-        } else if (data.length > 0) {
-          // Sem ID na URL? Pega o primeiro (Default)
-          setSelectedReservoirState(data[0]);
+        } else {
+          // Sem ID na URL: não pré-seleciona, permitindo o usuário escolher
+          setSelectedReservoirState(null);
         }
       } catch (error) {
         console.error("Erro ao carregar contexto de reservatórios:", error);
@@ -57,25 +56,32 @@ export function ReservoirProvider({ children }: { children: React.ReactNode }) {
   }, []); // Roda apenas uma vez na montagem
 
   // 2. Função para atualizar o estado e a URL
-  const setSelectedReservoir = (reservoir: ReservoirData) => {
+  const setSelectedReservoir = (reservoir: ReservoirData | null) => {
     setSelectedReservoirState(reservoir);
 
     // Atualiza a URL sem recarregar a página (shallow routing)
     const params = new URLSearchParams(searchParams.toString());
-    params.set("basin_id", reservoir.id.toString());
-    router.push(`?${params.toString()}`, { scroll: false });
+    if (reservoir) {
+      params.set("basin_id", reservoir.id.toString());
+    } else {
+      params.delete("basin_id");
+    }
+    const query = params.toString();
+    router.push(query ? `?${query}` : "?", { scroll: false });
   };
 
   // 3. Efeito para manter a sincronia se o usuário navegar pelo botão "Voltar" do navegador
   useEffect(() => {
     const urlId = searchParams.get("basin_id");
-    if (urlId && reservoirs.length > 0) {
-      const found = reservoirs.find((r) => r.id.toString() === urlId);
-      if (found && found.id !== selectedReservoir?.id) {
-        setSelectedReservoirState(found);
+    if (reservoirs.length > 0) {
+      if (urlId) {
+        const found = reservoirs.find((r) => r.id.toString() === urlId);
+        if (found && found.id !== selectedReservoir?.id) {
+          setSelectedReservoirState(found);
+        }
       }
     }
-  }, [searchParams, reservoirs]);
+  }, [searchParams, reservoirs, selectedReservoir]);
 
   return (
     <ReservoirContext.Provider
