@@ -14,6 +14,7 @@ import {
   Construction, FlaskConical, Minimize2, Clock,
   type LucideIcon,
 } from "lucide-react";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 
 interface Section {
   id: number;
@@ -158,7 +159,10 @@ export default function SituacaoHidricaPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
       setLoading(true);
       try {
         const [kpiData, sectionData] = await Promise.all([
@@ -219,6 +223,10 @@ export default function SituacaoHidricaPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Situação Hídrica" />;
   }
 
   return (

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { getActions } from "@/services/api";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
@@ -68,7 +69,10 @@ export default function PlanosAcaoPage() {
 
   useEffect(() => {
     async function loadInitialData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       const baseUrl =
@@ -173,6 +177,10 @@ export default function PlanosAcaoPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Planos de Ação" />;
   }
 
   return (

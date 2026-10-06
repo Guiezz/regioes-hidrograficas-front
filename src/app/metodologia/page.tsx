@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 
 interface Section {
   id: number;
@@ -38,7 +39,10 @@ export default function MetodologiaPage() {
 
   useEffect(() => {
     async function fetchData() {
-      if (!selectedReservoir) return;
+      if (!selectedReservoir) {
+        setLoading(false);
+        return;
+      }
 
       setLoading(true);
       try {
@@ -99,6 +103,10 @@ export default function MetodologiaPage() {
         </div>
       </div>
     );
+  }
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Metodologia" />;
   }
 
   // Separação Nível 1 (Título Principal)

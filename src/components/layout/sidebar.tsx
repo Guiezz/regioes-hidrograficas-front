@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useReservoir } from "@/context/ReservoirContext";
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -96,6 +97,14 @@ export function Sidebar({
   isMobile = false,
 }: SidebarProps) {
   const pathname = usePathname();
+  const { selectedReservoir } = useReservoir();
+
+  const getHref = (href: string) => {
+    if (!selectedReservoir) return href;
+    return href === "/"
+      ? `/?basin_id=${selectedReservoir.id}`
+      : `${href}?basin_id=${selectedReservoir.id}`;
+  };
 
   return (
     <aside
@@ -111,7 +120,7 @@ export function Sidebar({
       <div className="mb-6 px-1">
         {collapsed && !isMobile ? (
           <Link
-            href="/"
+            href={getHref("/")}
             className="flex items-center justify-center transition-all group py-1"
             title="SIGRH — Sistema de Informações de Gestão das Regiões Hidrográficas do Ceará"
           >
@@ -127,7 +136,7 @@ export function Sidebar({
           </Link>
         ) : (
           <Link
-            href="/"
+            href={getHref("/")}
             className="flex flex-col items-start transition-all group px-2 py-1"
             title="SIGRH — Sistema de Informações de Gestão das Regiões Hidrográficas do Ceará"
           >
@@ -174,7 +183,7 @@ export function Sidebar({
               return (
                 <Link
                   key={item.href}
-                  href={item.href}
+                  href={getHref(item.href)}
                   className={cn(
                     "text-sm group flex p-2.5 w-full font-medium cursor-pointer rounded-lg transition-all",
                     isActive
