@@ -109,3 +109,8 @@
 - [ ] **Step 2: Atualizar o body do PR**
   `gh pr edit 12 --body ...` acrescentando os dois itens (card da região; texto justificado) ao resumo e ao checklist de verificação, mantendo o conteúdo atual e a linha final `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
   Esperado: `gh pr view 12 --json body -q .body` mostra os novos itens.
+
+## Desvios
+
+- **Hero em `lg` (Task 1, Review Focus 2):** na verificação do passo 5 o card estourava a largura do conteúdo entre 1024 e ~1279px (já na `dev`), cortando o seletor "Infraestrutura". Causa medida: `min-width:auto` da coluna esquerda `flex-1` do hero, imposto pelo trigger do select sem região (`whitespace-nowrap`, 326px → coluna de 376px) e, com região, pela linha de CTAs (224 + 12 + 205 = 442px); de 1024 a ~1055px o h1 `lg:text-5xl` também limitava (palavra mais longa = 304px).
+- **Correção (commit separado, só classes em `page.tsx`):** `min-w-0` na coluna esquerda, `sm:flex-wrap` nos CTAs e h1 `lg:text-5xl` → `xl:text-5xl` (a 1024–1279px o título fica em 36px). Verificado em 1026, 1100 e 1279px, com e sem região: card dentro do conteúdo, `scrollWidth` = viewport, 390px e 1640px sem regressão.

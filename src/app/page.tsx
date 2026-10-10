@@ -115,10 +115,10 @@ export default function HomePage() {
 
         <div className="relative flex flex-col lg:flex-row items-stretch lg:items-center gap-10 px-6 py-10 lg:px-12 lg:py-14 max-w-7xl mx-auto">
           {/* Coluna da Esquerda */}
-          <div className="flex-1 space-y-6">
+          <div className="flex-1 min-w-0 space-y-6">
             {/* Título */}
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight leading-tight">
                 <span className="bg-gradient-to-r from-[#005384] via-[#0077b6] to-[#0094e0] bg-clip-text text-transparent">
                   Sistema de Informações de Gestão
                 </span>{" "}
@@ -162,7 +162,7 @@ export default function HomePage() {
             </div>
 
             {/* Ações (CTAs) */}
-            <div className="flex flex-col sm:flex-row gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:300ms]">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:300ms]">
               <Button
                 size="lg"
                 asChild
