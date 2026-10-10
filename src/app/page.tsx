@@ -129,7 +129,7 @@ export default function HomePage() {
             </div>
 
             {/* Descrição institucional */}
-            <p className="text-base md:text-lg text-[#1e3a5f] font-normal leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms]">
+            <p className="text-base md:text-lg text-[#1e3a5f] font-normal leading-relaxed text-justify [hyphens:auto] max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms]">
               Plataforma integrada de inteligência e governança hídrica voltada ao
               diagnóstico situacional, planejamento estratégico e suporte à tomada de
               decisão sobre as 11 regiões hidrográficas do Estado do Ceará.
@@ -318,7 +318,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold tracking-tight text-[#005384]">
             Funcionalidades do Sistema
           </h2>
-          <p className="text-[#2b5278] max-w-lg">
+          <p className="text-[#2b5278] text-justify [hyphens:auto] max-w-lg">
             Módulos integrados para o diagnóstico, planejamento e governança dos recursos hídricos
           </p>
         </div>
@@ -434,7 +434,7 @@ function FeatureCard({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <CardDescription className="text-sm leading-relaxed text-[#2b5278]">
+          <CardDescription className="text-sm leading-relaxed text-justify [hyphens:auto] text-[#2b5278]">
             {description}
           </CardDescription>
         </CardContent>
