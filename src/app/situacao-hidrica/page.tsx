@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
-import Image from "next/image";
 import { getSections, getKpis } from "@/services/api";
 import type { KPIItem, KPIResponse } from "@/services/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
+import { ZoomableImage } from "@/components/zoomable-image";
 
 interface Section {
   id: number;
@@ -338,7 +338,7 @@ export default function SituacaoHidricaPage() {
                     )}
 
                     {mainTitle?.content && (
-                      <div className="max-w-4xl pt-8 border-t border-slate-100">
+                      <div className="pt-8 border-t border-slate-100">
                         <div className="text-lg md:text-2xl text-slate-500 font-light leading-relaxed text-justify">
                           {renderContent(mainTitle.content)}
                         </div>
@@ -358,20 +358,30 @@ export default function SituacaoHidricaPage() {
                                   {section.title}
                                 </h2>
                               </div>
-                              {section.image && (
-                                <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm mx-auto max-w-full">
-                                  <Image
-                                    src={getImageUrl(section.image)}
-                                    alt={section.title}
-                                    width={1200}
-                                    height={600}
-                                    className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    unoptimized
-                                  />
+                              <div
+                                className={
+                                  section.image
+                                    ? "grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12 items-start"
+                                    : undefined
+                                }
+                              >
+                                {section.image && (
+                                  <div className="lg:col-span-2 lg:order-2">
+                                    <ZoomableImage
+                                      src={getImageUrl(section.image)}
+                                      alt={section.title}
+                                    />
+                                  </div>
+                                )}
+                                <div
+                                  className={
+                                    section.image
+                                      ? "overflow-hidden lg:col-span-3 lg:order-1"
+                                      : "max-w-none overflow-hidden"
+                                  }
+                                >
+                                  {renderContent(section.content)}
                                 </div>
-                              )}
-                              <div className="max-w-none overflow-hidden">
-                                {renderContent(section.content)}
                               </div>
                               {children.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
