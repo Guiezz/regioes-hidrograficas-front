@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
-import Image from "next/image";
 import { getSections } from "@/services/api";
 import { Loader2, MapPin, Anchor } from "lucide-react";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
+import { ZoomableImage } from "@/components/zoomable-image";
 
 interface Section {
   id: number;
@@ -118,7 +118,7 @@ export default function IdentificacaoPage() {
 
           {mainTitle?.content && (
             <div className="pt-8 border-t border-slate-100">
-              <div className="text-xl md:text-2xl text-slate-500 font-light leading-relaxed max-w-2xl text-justify">
+              <div className="text-xl md:text-2xl text-slate-500 font-light leading-relaxed text-justify">
                 {renderContent(mainTitle.content)}
               </div>
             </div>
@@ -136,30 +136,22 @@ export default function IdentificacaoPage() {
                 </div>
 
                 {section.image && (
-                  <div className="relative pb-5">
-                    <div className="overflow-hidden bg-slate-50 rounded-2xl border border-slate-200 shadow-sm">
-                      <Image
-                        src={getImageUrl(section.image)}
-                        alt={section.title}
-                        width={1200}
-                        height={800}
-                        className="w-full h-auto grayscale-[0.2] contrast-[1.05] transition-all duration-1000 group-hover:grayscale-0 group-hover:scale-[1.02]"
-                        unoptimized
-                      />
-                    </div>
-                    <div className="mt-4 flex items-start gap-3 px-2">
+                  <figure className="pb-5">
+                    <ZoomableImage
+                      src={getImageUrl(section.image)}
+                      alt={section.title}
+                    />
+                    <figcaption className="mt-4 flex items-start gap-3 px-2">
                       <Anchor className="w-4 h-4 text-sky-500 mt-1 shrink-0" />
                       <p className="text-[13px] text-slate-500 leading-snug font-medium italic">
                         Figura - {section.title}. Fonte: Acervo Técnico da
                         Unidade de Gestão Hidrográfica.
                       </p>
-                    </div>
-                  </div>
+                    </figcaption>
+                  </figure>
                 )}
 
-                <div className="max-w-4xl">
-                  {renderContent(section.content)}
-                </div>
+                <div>{renderContent(section.content)}</div>
               </div>
             </article>
           ))}

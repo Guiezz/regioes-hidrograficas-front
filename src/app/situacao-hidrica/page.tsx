@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
-import Image from "next/image";
 import { getSections, getKpis } from "@/services/api";
 import type { KPIItem, KPIResponse } from "@/services/api";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +14,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
+import { ZoomableImage } from "@/components/zoomable-image";
 
 interface Section {
   id: number;
@@ -338,7 +338,7 @@ export default function SituacaoHidricaPage() {
                     )}
 
                     {mainTitle?.content && (
-                      <div className="max-w-4xl pt-8 border-t border-slate-100">
+                      <div className="pt-8 border-t border-slate-100">
                         <div className="text-lg md:text-2xl text-slate-500 font-light leading-relaxed text-justify">
                           {renderContent(mainTitle.content)}
                         </div>
@@ -359,16 +359,10 @@ export default function SituacaoHidricaPage() {
                                 </h2>
                               </div>
                               {section.image && (
-                                <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm mx-auto max-w-full">
-                                  <Image
-                                    src={getImageUrl(section.image)}
-                                    alt={section.title}
-                                    width={1200}
-                                    height={600}
-                                    className="w-full h-auto object-cover transition-transform duration-1000 group-hover:scale-105"
-                                    unoptimized
-                                  />
-                                </div>
+                                <ZoomableImage
+                                  src={getImageUrl(section.image)}
+                                  alt={section.title}
+                                />
                               )}
                               <div className="max-w-none overflow-hidden">
                                 {renderContent(section.content)}
