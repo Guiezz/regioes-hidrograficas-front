@@ -202,21 +202,23 @@ export default function HomePage() {
           <div className="flex-1 w-full lg:max-w-md xl:max-w-xl flex justify-center items-center animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms]">
             <div className="relative w-full rounded-2xl overflow-hidden border border-[#005384]/20 bg-white shadow-xl shadow-blue-900/10 group flex flex-col">
               {/* Barra Superior do Card */}
-              <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-blue-50/50 border-b border-slate-100 flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#005384]/10 text-[#005384] border border-[#005384]/20">
-                  <MapPin className="h-3 w-3 text-[#005384]" />
-                  {selectedReservoir?.name
-                    ? `Região ${selectedReservoir.name}`
-                    : "Regiões Hidrográficas do Ceará"}
+              <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-blue-50/50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#005384]/10 text-[#005384] border border-[#005384]/20 whitespace-nowrap min-w-0 max-w-full">
+                  <MapPin className="h-3 w-3 shrink-0 text-[#005384]" />
+                  <span className="truncate">
+                    {selectedReservoir?.name
+                      ? `Região ${selectedReservoir.name}`
+                      : "Regiões Hidrográficas do Ceará"}
+                  </span>
                 </span>
 
                 {/* Seletores de Mapa quando há região selecionada */}
                 {selectedReservoir ? (
-                  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs">
+                  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs w-full sm:w-auto sm:ml-auto">
                     <button
                       type="button"
                       onClick={() => setSelectedMapType("1.2")}
-                      className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                      className={`flex-1 sm:flex-none whitespace-nowrap text-center px-2.5 py-0.5 rounded-md font-medium transition-all ${
                         selectedMapType === "1.2"
                           ? "bg-[#005384] text-white shadow-xs"
                           : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
@@ -228,7 +230,7 @@ export default function HomePage() {
                       <button
                         type="button"
                         onClick={() => setSelectedMapType("1.3")}
-                        className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                        className={`flex-1 sm:flex-none whitespace-nowrap text-center px-2.5 py-0.5 rounded-md font-medium transition-all ${
                           selectedMapType === "1.3"
                             ? "bg-[#005384] text-white shadow-xs"
                             : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
@@ -239,7 +241,7 @@ export default function HomePage() {
                     )}
                   </div>
                 ) : (
-                  <span className="text-[11px] font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60">
+                  <span className="text-[11px] font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60 whitespace-nowrap">
                     11 Regiões
                   </span>
                 )}
@@ -277,8 +279,8 @@ export default function HomePage() {
               </div>
 
               {/* Rodapé Informativo com Link para Identificação */}
-              <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
+              <div className="p-4 bg-white border-t border-slate-100 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <div className="space-y-0.5 min-w-0">
                   <p className="text-sm font-semibold text-[#005384] leading-tight">
                     {selectedReservoir
                       ? activeMap?.title || "Mapa da Região Hidrográfica"
@@ -293,7 +295,7 @@ export default function HomePage() {
                 {selectedReservoir ? (
                   <Link
                     href={`/identificacao?basin_id=${selectedReservoir.id}`}
-                    className="shrink-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
+                    className="shrink-0 -ml-2.5 sm:ml-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
                     title="Ver seção completa de Identificação"
                   >
                     Identificação
