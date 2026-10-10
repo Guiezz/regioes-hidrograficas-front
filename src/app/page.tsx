@@ -113,7 +113,7 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[2%] via-transparent to-primary/[1%] pointer-events-none" />
 
-        <div className="relative flex flex-col lg:flex-row items-center gap-10 px-6 py-10 lg:px-12 lg:py-14 max-w-7xl mx-auto">
+        <div className="relative flex flex-col lg:flex-row items-stretch lg:items-center gap-10 px-6 py-10 lg:px-12 lg:py-14 max-w-7xl mx-auto">
           {/* Coluna da Esquerda */}
           <div className="flex-1 space-y-6">
             {/* Título */}
