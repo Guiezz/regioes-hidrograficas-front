@@ -358,30 +358,14 @@ export default function SituacaoHidricaPage() {
                                   {section.title}
                                 </h2>
                               </div>
-                              <div
-                                className={
-                                  section.image
-                                    ? "grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12 items-start"
-                                    : undefined
-                                }
-                              >
-                                {section.image && (
-                                  <div className="lg:col-span-2 lg:order-2">
-                                    <ZoomableImage
-                                      src={getImageUrl(section.image)}
-                                      alt={section.title}
-                                    />
-                                  </div>
-                                )}
-                                <div
-                                  className={
-                                    section.image
-                                      ? "overflow-hidden lg:col-span-3 lg:order-1"
-                                      : "max-w-none overflow-hidden"
-                                  }
-                                >
-                                  {renderContent(section.content)}
-                                </div>
+                              {section.image && (
+                                <ZoomableImage
+                                  src={getImageUrl(section.image)}
+                                  alt={section.title}
+                                />
+                              )}
+                              <div className="max-w-none overflow-hidden">
+                                {renderContent(section.content)}
                               </div>
                               {children.length > 0 && (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

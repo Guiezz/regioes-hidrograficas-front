@@ -25,7 +25,7 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
           type="button"
           aria-label={`Ampliar imagem: ${alt}`}
           className={cn(
-            "group relative block w-full aspect-[4/3] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500",
+            "group relative block w-full h-[260px] sm:h-[360px] lg:h-[460px] overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm cursor-zoom-in focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500",
             className
           )}
         >
@@ -33,7 +33,7 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
             src={src}
             alt={alt}
             fill
-            sizes="(min-width: 1024px) 40vw, 100vw"
+            sizes="(min-width: 1024px) 1000px, 100vw"
             className="object-contain p-2"
             unoptimized
           />

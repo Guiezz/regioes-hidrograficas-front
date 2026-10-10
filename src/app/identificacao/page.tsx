@@ -135,33 +135,23 @@ export default function IdentificacaoPage() {
                   </h2>
                 </div>
 
-                <div
-                  className={
-                    section.image
-                      ? "grid grid-cols-1 gap-8 lg:grid-cols-5 lg:gap-12 items-start"
-                      : undefined
-                  }
-                >
-                  {section.image && (
-                    <figure className="lg:col-span-2 lg:order-2">
-                      <ZoomableImage
-                        src={getImageUrl(section.image)}
-                        alt={section.title}
-                      />
-                      <figcaption className="mt-4 flex items-start gap-3 px-2">
-                        <Anchor className="w-4 h-4 text-sky-500 mt-1 shrink-0" />
-                        <p className="text-[13px] text-slate-500 leading-snug font-medium italic">
-                          Figura - {section.title}. Fonte: Acervo Técnico da
-                          Unidade de Gestão Hidrográfica.
-                        </p>
-                      </figcaption>
-                    </figure>
-                  )}
+                {section.image && (
+                  <figure className="pb-5">
+                    <ZoomableImage
+                      src={getImageUrl(section.image)}
+                      alt={section.title}
+                    />
+                    <figcaption className="mt-4 flex items-start gap-3 px-2">
+                      <Anchor className="w-4 h-4 text-sky-500 mt-1 shrink-0" />
+                      <p className="text-[13px] text-slate-500 leading-snug font-medium italic">
+                        Figura - {section.title}. Fonte: Acervo Técnico da
+                        Unidade de Gestão Hidrográfica.
+                      </p>
+                    </figcaption>
+                  </figure>
+                )}
 
-                  <div className="lg:col-span-3 lg:order-1">
-                    {renderContent(section.content)}
-                  </div>
-                </div>
+                <div>{renderContent(section.content)}</div>
               </div>
             </article>
           ))}
