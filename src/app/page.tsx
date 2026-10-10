@@ -113,12 +113,12 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[2%] via-transparent to-primary/[1%] pointer-events-none" />
 
-        <div className="relative flex flex-col lg:flex-row items-center gap-10 px-6 py-10 lg:px-12 lg:py-14 max-w-7xl mx-auto">
+        <div className="relative flex flex-col lg:flex-row items-stretch lg:items-center gap-10 px-6 py-10 lg:px-12 lg:py-14 max-w-7xl mx-auto">
           {/* Coluna da Esquerda */}
-          <div className="flex-1 space-y-6">
+          <div className="flex-1 min-w-0 space-y-6">
             {/* Título */}
             <div className="space-y-2 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight leading-tight">
                 <span className="bg-gradient-to-r from-[#005384] via-[#0077b6] to-[#0094e0] bg-clip-text text-transparent">
                   Sistema de Informações de Gestão
                 </span>{" "}
@@ -129,7 +129,7 @@ export default function HomePage() {
             </div>
 
             {/* Descrição institucional */}
-            <p className="text-base md:text-lg text-[#1e3a5f] font-normal leading-relaxed max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms]">
+            <p className="text-base md:text-lg text-[#1e3a5f] font-normal leading-relaxed text-justify [hyphens:auto] max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms]">
               Plataforma integrada de inteligência e governança hídrica voltada ao
               diagnóstico situacional, planejamento estratégico e suporte à tomada de
               decisão sobre as 11 regiões hidrográficas do Estado do Ceará.
@@ -155,14 +155,14 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-50 border border-sky-200/80 text-xs text-[#005384] font-medium">
                   <Info className="h-4 w-4 text-[#0094e0] shrink-0" />
                   <span>
-                    Por favor, selecione uma região no topo da página ou no campo acima para visualizar os dados completos.
+                    Por favor, selecione uma região no campo acima para visualizar os dados completos.
                   </span>
                 </div>
               )}
             </div>
 
             {/* Ações (CTAs) */}
-            <div className="flex flex-col sm:flex-row gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:300ms]">
+            <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:300ms]">
               <Button
                 size="lg"
                 asChild
@@ -202,21 +202,23 @@ export default function HomePage() {
           <div className="flex-1 w-full lg:max-w-md xl:max-w-xl flex justify-center items-center animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms]">
             <div className="relative w-full rounded-2xl overflow-hidden border border-[#005384]/20 bg-white shadow-xl shadow-blue-900/10 group flex flex-col">
               {/* Barra Superior do Card */}
-              <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-blue-50/50 border-b border-slate-100 flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#005384]/10 text-[#005384] border border-[#005384]/20">
-                  <MapPin className="h-3 w-3 text-[#005384]" />
-                  {selectedReservoir?.name
-                    ? `Região ${selectedReservoir.name}`
-                    : "Regiões Hidrográficas do Ceará"}
+              <div className="px-4 py-3 bg-gradient-to-r from-slate-50 to-blue-50/50 border-b border-slate-100 flex flex-wrap items-center justify-between gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#005384]/10 text-[#005384] border border-[#005384]/20 whitespace-nowrap min-w-0 max-w-full">
+                  <MapPin className="h-3 w-3 shrink-0 text-[#005384]" />
+                  <span className="truncate">
+                    {selectedReservoir?.name
+                      ? `Região ${selectedReservoir.name}`
+                      : "Regiões Hidrográficas do Ceará"}
+                  </span>
                 </span>
 
                 {/* Seletores de Mapa quando há região selecionada */}
                 {selectedReservoir ? (
-                  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs">
+                  <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 text-xs w-full sm:w-auto sm:ml-auto">
                     <button
                       type="button"
                       onClick={() => setSelectedMapType("1.2")}
-                      className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                      className={`flex-1 sm:flex-none whitespace-nowrap text-center px-2.5 py-0.5 rounded-md font-medium transition-all ${
                         selectedMapType === "1.2"
                           ? "bg-[#005384] text-white shadow-xs"
                           : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
@@ -228,7 +230,7 @@ export default function HomePage() {
                       <button
                         type="button"
                         onClick={() => setSelectedMapType("1.3")}
-                        className={`px-2.5 py-0.5 rounded-md font-medium transition-all ${
+                        className={`flex-1 sm:flex-none whitespace-nowrap text-center px-2.5 py-0.5 rounded-md font-medium transition-all ${
                           selectedMapType === "1.3"
                             ? "bg-[#005384] text-white shadow-xs"
                             : "text-[#2b5278] hover:text-[#005384] hover:bg-slate-50"
@@ -239,7 +241,7 @@ export default function HomePage() {
                     )}
                   </div>
                 ) : (
-                  <span className="text-[11px] font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60">
+                  <span className="text-[11px] font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60 whitespace-nowrap">
                     11 Regiões
                   </span>
                 )}
@@ -277,8 +279,8 @@ export default function HomePage() {
               </div>
 
               {/* Rodapé Informativo com Link para Identificação */}
-              <div className="p-4 bg-white border-t border-slate-100 flex items-center justify-between gap-3">
-                <div className="space-y-0.5">
+              <div className="p-4 bg-white border-t border-slate-100 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
+                <div className="space-y-0.5 min-w-0">
                   <p className="text-sm font-semibold text-[#005384] leading-tight">
                     {selectedReservoir
                       ? activeMap?.title || "Mapa da Região Hidrográfica"
@@ -287,13 +289,13 @@ export default function HomePage() {
                   <p className="text-xs text-[#2b5278]/80">
                     {selectedReservoir
                       ? `Bacia Hidrográfica do ${selectedReservoir.name} • Acervo SIGRH`
-                      : "Por favor, selecione uma região no topo da página para visualizar os dados."}
+                      : "Por favor, selecione uma região para visualizar os dados."}
                   </p>
                 </div>
                 {selectedReservoir ? (
                   <Link
                     href={`/identificacao?basin_id=${selectedReservoir.id}`}
-                    className="shrink-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
+                    className="shrink-0 -ml-2.5 sm:ml-0 text-xs font-semibold text-[#005384] hover:text-[#0094e0] inline-flex items-center gap-1 transition-colors px-2.5 py-1.5 rounded-md hover:bg-blue-50"
                     title="Ver seção completa de Identificação"
                   >
                     Identificação
@@ -316,7 +318,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold tracking-tight text-[#005384]">
             Funcionalidades do Sistema
           </h2>
-          <p className="text-[#2b5278] max-w-lg">
+          <p className="text-[#2b5278] text-justify [hyphens:auto] max-w-lg">
             Módulos integrados para o diagnóstico, planejamento e governança dos recursos hídricos
           </p>
         </div>
@@ -432,7 +434,7 @@ function FeatureCard({
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <CardDescription className="text-sm leading-relaxed text-[#2b5278]">
+          <CardDescription className="text-sm leading-relaxed text-justify [hyphens:auto] text-[#2b5278]">
             {description}
           </CardDescription>
         </CardContent>

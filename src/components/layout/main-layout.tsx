@@ -37,7 +37,7 @@ export default function MainLayout({
       {/* --- CONTEÚDO PRINCIPAL --- */}
       <main
         className={cn(
-          "flex flex-col flex-1 h-full transition-all duration-300 ease-in-out",
+          "flex flex-col flex-1 min-w-0 h-full transition-all duration-300 ease-in-out",
           isSidebarOpen ? "md:pl-72" : "md:pl-20",
         )}
       >

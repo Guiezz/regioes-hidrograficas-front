@@ -1,17 +1,12 @@
 "use client";
 
-import { ReservoirSelector } from "@/components/layout/ReservoirSelector";
 import { MapPin, Info, Compass } from "lucide-react";
 
 interface SelectRegionPromptProps {
   moduleName: string;
-  description?: string;
 }
 
-export function SelectRegionPrompt({
-  moduleName,
-  description = "A visualização dos indicadores, mapas e planos analíticos requer a escolha de uma região hidrográfica.",
-}: SelectRegionPromptProps) {
+export function SelectRegionPrompt({ moduleName }: SelectRegionPromptProps) {
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
       <div className="max-w-xl mx-auto space-y-6 flex flex-col items-center">
@@ -37,14 +32,6 @@ export function SelectRegionPrompt({
               <strong className="font-semibold">{moduleName}</strong>.
             </p>
           </div>
-        </div>
-
-        {/* Seletor direto no corpo da página */}
-        <div className="w-full max-w-sm pt-2 space-y-2">
-          <span className="text-xs text-muted-foreground block font-medium">
-            Ou escolha uma região hidrográfica abaixo:
-          </span>
-          <ReservoirSelector fullWidth />
         </div>
       </div>
     </div>
