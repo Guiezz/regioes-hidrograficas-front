@@ -155,7 +155,7 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-50 border border-sky-200/80 text-xs text-[#005384] font-medium">
                   <Info className="h-4 w-4 text-[#0094e0] shrink-0" />
                   <span>
-                    Por favor, selecione uma região no topo da página ou no campo acima para visualizar os dados completos.
+                    Por favor, selecione uma região no campo acima para visualizar os dados completos.
                   </span>
                 </div>
               )}
@@ -287,7 +287,7 @@ export default function HomePage() {
                   <p className="text-xs text-[#2b5278]/80">
                     {selectedReservoir
                       ? `Bacia Hidrográfica do ${selectedReservoir.name} • Acervo SIGRH`
-                      : "Por favor, selecione uma região no topo da página para visualizar os dados."}
+                      : "Por favor, selecione uma região para visualizar os dados."}
                   </p>
                 </div>
                 {selectedReservoir ? (
