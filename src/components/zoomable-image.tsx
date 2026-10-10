@@ -45,7 +45,7 @@ export function ZoomableImage({ src, alt, className }: ZoomableImageProps) {
           </span>
         </button>
       </DialogTrigger>
-      <DialogContent className="w-auto max-w-[95vw] sm:max-w-[95vw] p-3 sm:p-4">
+      <DialogContent className="w-max max-w-[95vw] sm:max-w-[95vw] p-3 sm:p-4">
         <Image
           src={src}
           alt={alt}
