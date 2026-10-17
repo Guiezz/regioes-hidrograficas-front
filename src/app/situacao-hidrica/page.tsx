@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getSections, getKpis } from "@/services/api";
 import type { KPIItem, KPIResponse } from "@/services/api";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
+import { isChildOf } from "@/lib/sections";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Loader2,
   MapPin, Building2, Activity, Waves, Scale,
   Droplets, CheckCircle2, AlertTriangle, TrendingDown,
   TrendingUp, Users, Sprout, Factory, Thermometer,
@@ -152,36 +154,38 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
 
 export default function SituacaoHidricaPage() {
   const { selectedReservoir } = useReservoir();
-  const [kpis, setKpis] = useState<KPIResponse>({});
-  const [sections, setSections] = useState<Section[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<TabKey>("infraestrutura");
+  const regionId = selectedReservoir?.id;
+  const [view, setView] = useState<{ regionId?: number; tab: TabKey }>({
+    regionId,
+    tab: "infraestrutura",
+  });
+  if (view.regionId !== regionId) {
+    setView({ regionId, tab: "infraestrutura" });
+  }
+  const activeTab = view.regionId === regionId ? view.tab : "infraestrutura";
+  const setActiveTab = (tab: TabKey) => setView({ regionId, tab });
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const [kpiData, sectionData] = await Promise.all([
-          getKpis(selectedReservoir.id),
-          getSections(selectedReservoir.id),
-        ]);
-        setKpis(kpiData);
-        const sorted = sectionData.sort((a: Section, b: Section) =>
-          a.number.localeCompare(b.number, undefined, { numeric: true })
-        );
-        setSections(sorted);
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [selectedReservoir]);
+  const { data, status, retry } = useAsyncData<{
+    kpis: KPIResponse;
+    sections: Section[];
+  }>(
+    regionId
+      ? async () => {
+          const [kpiData, sectionData] = await Promise.all([
+            getKpis(regionId),
+            getSections(regionId),
+          ]);
+          const sorted = [...sectionData].sort((a: Section, b: Section) =>
+            a.number.localeCompare(b.number, undefined, { numeric: true }),
+          );
+          return { kpis: kpiData, sections: sorted };
+        }
+      : null,
+    [regionId],
+  );
+  const ready = status === "ready" && !!data;
+  const kpis: KPIResponse = ready ? data.kpis : {};
+  const sections: Section[] = ready ? data.sections : [];
 
   const renderContent = useCallback((text: string) => {
     if (!text) return null;
@@ -204,26 +208,14 @@ export default function SituacaoHidricaPage() {
   }, []);
 
   const config = TAB_CONFIG[activeTab];
-  const currentKPIs = [
-    ...(kpis[activeTab]?.atual || []),
-    ...(kpis[activeTab]?.futuro || []),
-  ];
-  const tabSections = sections.filter((s) => s.number.startsWith(config.chapter));
+  const tabSections = sections.filter((s) => isChildOf(s.number, config.chapter));
+  const hasAnyData =
+    sections.length > 0 ||
+    (Object.keys(TAB_CONFIG) as TabKey[]).some(
+      (k) => (kpis[k]?.atual?.length ?? 0) + (kpis[k]?.futuro?.length ?? 0) > 0,
+    );
   const mainTitle = tabSections.find((s) => s.level === 1);
   const topLevelSections = tabSections.filter((s) => s.level === 2);
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-200" />
-          <span className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase italic">
-            Analisando Situação Hídrica
-          </span>
-        </div>
-      </div>
-    );
-  }
 
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Situação Hídrica" />;
@@ -254,10 +246,12 @@ export default function SituacaoHidricaPage() {
           </div>
         </header>
 
-        {currentKPIs.length === 0 && topLevelSections.length === 0 ? (
-          <div className="text-center py-20 text-slate-400">
-            <p>Nenhum dado encontrado para esta bacia.</p>
-          </div>
+        {status === "loading" || status === "idle" ? (
+          <DataState status="loading" />
+        ) : status === "error" ? (
+          <DataState status="error" onRetry={retry} />
+        ) : !hasAnyData ? (
+          <DataState status="empty" />
         ) : (
           <>
             <div className="sticky top-4 z-20 mb-12 overflow-hidden">
@@ -349,7 +343,7 @@ export default function SituacaoHidricaPage() {
                       <div className="space-y-16">
                         {topLevelSections.map((section) => {
                           const children = tabSections.filter(
-                            (s) => s.level === 3 && s.number.startsWith(section.number),
+                            (s) => s.level === 3 && s.number.startsWith(section.number + "."),
                           );
                           return (
                             <article key={section.id} className="space-y-8">
@@ -371,7 +365,7 @@ export default function SituacaoHidricaPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {children.map((child) => {
                                     const subItems = tabSections.filter(
-                                      (s) => s.level === 4 && s.number.startsWith(child.number),
+                                      (s) => s.level === 4 && s.number.startsWith(child.number + "."),
                                     );
                                     return (
                                       <div
