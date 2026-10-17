@@ -168,6 +168,10 @@ export default function MonitoramentoPage() {
 
   const actions: ActionItem[] = status === "ready" && actionsData ? actionsData : [];
 
+  const hasActiveFilters =
+    selectedEixo !== "todos" ||
+    selectedTipo !== "todos" ||
+    selectedCrono !== "todos";
   const clearFilters = () => {
     setView((v) => ({ ...v, eixo: "todos", tipo: "todos", crono: "todos", page: 1 }));
   };
@@ -205,6 +209,7 @@ export default function MonitoramentoPage() {
 
   const formatDecimal = (val: number | null) => {
     if (val === null || val === undefined) return "-";
+    if (val > 0 && val < 0.01) return "< 0,01";
     return new Intl.NumberFormat("pt-BR", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
@@ -369,7 +374,7 @@ export default function MonitoramentoPage() {
         ) : status === "error" ? (
           <div className="mb-16"><DataState status="error" onRetry={retry} /></div>
         ) : actions.length === 0 ? (
-          <div className="mb-16"><DataState status="empty" onClearFilters={clearFilters} /></div>
+          <div className="mb-16"><DataState status="empty" onClearFilters={hasActiveFilters ? clearFilters : undefined} /></div>
         ) : (
         <div className="rounded-xl border border-slate-200 shadow-xl shadow-slate-200/20 bg-white flex flex-col w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden mb-16">
           <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
