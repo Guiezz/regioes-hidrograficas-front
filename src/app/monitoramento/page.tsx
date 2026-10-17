@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getActions } from "@/services/api";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
 import axios from "axios";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { Badge } from "@/components/ui/badge";
@@ -23,7 +25,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Loader2,
   X,
   Activity,
   ChevronLeft,
@@ -31,6 +32,24 @@ import {
   Target,
   LayoutList,
 } from "lucide-react";
+
+interface Measurement {
+  execution_perc?: number;
+  iea_relativo?: number;
+}
+interface ActionItem {
+  id: number;
+  axis_name?: string;
+  description?: string;
+  typology?: string;
+  start_year: number;
+  end_year: number;
+  measurements?: Measurement[];
+}
+interface FiltersData {
+  eixos: string[];
+  tipologias: string[];
+}
 
 const PRAZOS = {
   curto: { inicio: 2024, fim: 2033 },
@@ -50,12 +69,10 @@ const intersects = (
 export default function MonitoramentoPage() {
   const { selectedReservoir } = useReservoir();
 
-  const [actions, setActions] = useState<any[]>([]);
-  const [filtersData, setFiltersData] = useState<any>({
+  const [filtersData, setFiltersData] = useState<FiltersData>({
     eixos: [],
     tipologias: [],
   });
-  const [loading, setLoading] = useState(true);
 
   // Filtros
   const [selectedEixo, setSelectedEixo] = useState("todos");
@@ -65,77 +82,98 @@ export default function MonitoramentoPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 7;
 
+  const regionId = selectedReservoir?.id;
+
   useEffect(() => {
-    async function loadInitialData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
+    if (!regionId) return;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+    let cancelled = false;
+    axios
+      .get(`${baseUrl}/actions/filters?basin_id=${regionId}`)
+      .then((res) => {
+        if (!cancelled) setFiltersData(res.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar filtros:", error);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [regionId]);
 
-      setLoading(true);
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+  const {
+    data: actionsData,
+    status,
+    retry,
+  } = useAsyncData<ActionItem[]>(
+    regionId
+      ? async () => {
+          const res = await getActions(regionId, {
+            eixo: selectedEixo === "todos" ? "" : selectedEixo,
+            tipologia: selectedTipo === "todos" ? "" : selectedTipo,
+          });
+          const rawList: ActionItem[] = Array.isArray(res) ? res : (res as { data?: ActionItem[] })?.data || [];
+          return rawList.filter((item: ActionItem) => {
+            if (selectedCrono === "todos") return true;
+            const start = item.start_year || 0;
+            const end = item.end_year || start;
+            const range =
+              selectedCrono === "Curto Prazo"
+                ? PRAZOS.curto
+                : selectedCrono === "Médio Prazo"
+                  ? PRAZOS.medio
+                  : selectedCrono === "Longo Prazo"
+                    ? PRAZOS.longo
+                    : null;
+            return range ? intersects(start, end, range.inicio, range.fim) : true;
+          });
+        }
+      : null,
+    [regionId, selectedEixo, selectedTipo, selectedCrono],
+  );
 
-      try {
-        const filtersRes = await axios.get(
-          `${baseUrl}/actions/filters?basin_id=${selectedReservoir.id}`,
-        );
-        setFiltersData(filtersRes.data);
+  // Região inteira, sem filtros: decide o aviso de "sem medições".
+  const { data: allActions, status: allStatus } = useAsyncData<ActionItem[]>(
+    regionId
+      ? async () => {
+          const res = await getActions(regionId);
+          return Array.isArray(res) ? res : (res as { data?: ActionItem[] })?.data || [];
+        }
+      : null,
+    [regionId],
+  );
+  const noMeasurementsYet =
+    allStatus === "ready" &&
+    !!allActions &&
+    !allActions.some((a: ActionItem) => (a.measurements?.length ?? 0) > 0);
 
-        const actionsData = await getActions(selectedReservoir.id, {
-          eixo: selectedEixo === "todos" ? "" : selectedEixo,
-          tipologia: selectedTipo === "todos" ? "" : selectedTipo,
-        });
+  const actions: ActionItem[] = status === "ready" && actionsData ? actionsData : [];
 
-        const rawList = Array.isArray(actionsData)
-          ? actionsData
-          : (actionsData as any).data || [];
+  const clearFilters = () => {
+    setSelectedEixo("todos");
+    setSelectedTipo("todos");
+    setSelectedCrono("todos");
+    setCurrentPage(1);
+  };
 
-        // Filtro local de cronograma
-        const filteredList = rawList.filter((item: any) => {
-          if (selectedCrono === "todos") return true;
+  const getExecutionStatus = (
+    item: ActionItem,
+  ): {
+    label: "Sem medição registrada" | "Não iniciada" | "Em andamento" | "Concluída";
+    perc: number | null;
+  } => {
+    const ms = item.measurements;
+    if (!ms || ms.length === 0)
+      return { label: "Sem medição registrada", perc: null };
+    const frac = Number(ms[ms.length - 1].execution_perc) || 0;
+    const perc = frac * 100;
+    if (frac === 0) return { label: "Não iniciada", perc: 0 };
+    if (frac >= 1) return { label: "Concluída", perc: 100 };
+    return { label: "Em andamento", perc };
+  };
 
-          const start = item.start_year || 0;
-          const end = item.end_year || start;
-
-          if (selectedCrono === "Curto Prazo") {
-            return intersects(
-              start,
-              end,
-              PRAZOS.curto.inicio,
-              PRAZOS.curto.fim,
-            );
-          }
-          if (selectedCrono === "Médio Prazo") {
-            return intersects(
-              start,
-              end,
-              PRAZOS.medio.inicio,
-              PRAZOS.medio.fim,
-            );
-          }
-          if (selectedCrono === "Longo Prazo") {
-            return intersects(
-              start,
-              end,
-              PRAZOS.longo.inicio,
-              PRAZOS.longo.fim,
-            );
-          }
-          return true;
-        });
-
-        setActions(filteredList);
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadInitialData();
-  }, [selectedReservoir, selectedEixo, selectedTipo, selectedCrono]);
-
-  const getLatestIEARel = (item: any) => {
+  const getLatestIEARel = (item: ActionItem) => {
     if (!item.measurements || item.measurements.length === 0) return null;
     const lastMeasurement = item.measurements[item.measurements.length - 1];
     return lastMeasurement.iea_relativo || 0;
@@ -166,16 +204,6 @@ export default function MonitoramentoPage() {
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-emerald-500" />
-        </div>
-      </div>
-    );
-  }
 
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Monitoramento" />;
@@ -214,6 +242,17 @@ export default function MonitoramentoPage() {
             </p>
           </div>
         </header>
+
+        {noMeasurementsYet && (
+          <div
+            role="note"
+            className="mb-6 rounded-xl border border-sky-100 bg-sky-50/60 px-5 py-4 text-sm leading-relaxed text-slate-600"
+          >
+            O acompanhamento da execução destas ações ainda não começou. As
+            ações e prazos abaixo são os previstos no plano; o status de cada
+            uma aparecerá aqui quando as medições forem registradas.
+          </div>
+        )}
 
         {/* Filtros */}
         <section className="mb-8 p-4 md:p-6 rounded-2xl bg-emerald-50/30 border border-emerald-100/50 w-full">
@@ -294,11 +333,7 @@ export default function MonitoramentoPage() {
 
             <Button
               variant="outline"
-              onClick={() => {
-                setSelectedEixo("todos");
-                setSelectedTipo("todos");
-                setSelectedCrono("todos");
-              }}
+              onClick={clearFilters}
               className="w-full border-dashed border-slate-300 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 h-10 uppercase text-[10px] font-bold tracking-widest"
             >
               <X className="w-3 h-3 mr-2" /> Limpar Filtros
@@ -307,6 +342,13 @@ export default function MonitoramentoPage() {
         </section>
 
         {/* Tabela com scroll responsivo */}
+        {status === "loading" || status === "idle" ? (
+          <div className="mb-16"><DataState status="loading" /></div>
+        ) : status === "error" ? (
+          <div className="mb-16"><DataState status="error" onRetry={retry} /></div>
+        ) : actions.length === 0 ? (
+          <div className="mb-16"><DataState status="empty" onClearFilters={clearFilters} /></div>
+        ) : (
         <div className="rounded-xl border border-slate-200 shadow-xl shadow-slate-200/20 bg-white flex flex-col w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden mb-16">
           <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
             <Table className="w-full table-fixed min-w-212.5">
@@ -332,7 +374,8 @@ export default function MonitoramentoPage() {
               <TableBody>
                 {currentItems.length > 0 ? (
                   currentItems.map((item) => {
-                    const ieaRel = getLatestIEARel(item);
+                    const exec = getExecutionStatus(item);
+                    const ieaRel = exec.perc === null ? null : getLatestIEARel(item);
                     return (
                       <TableRow
                         key={item.id}
@@ -345,9 +388,6 @@ export default function MonitoramentoPage() {
                           <p className="text-sm font-medium text-slate-700 leading-relaxed text-justify whitespace-normal wrap-break-word hyphens-auto">
                             {item.description}
                           </p>
-                          <span className="text-[9px] text-slate-300 mt-2 block font-mono select-none">
-                            ID: #{item.id}
-                          </span>
                         </TableCell>
 
                         <TableCell className="px-5 py-5 align-top">
@@ -377,26 +417,42 @@ export default function MonitoramentoPage() {
                             </div>
                           ) : (
                             <span className="text-slate-300 font-mono text-xs">
-                              -
+                              —
                             </span>
                           )}
                         </TableCell>
 
                         <TableCell className="px-5 py-5 align-top text-right">
-                          <div className="flex flex-col items-end gap-1">
-                            <div className="flex items-center gap-2">
+                          {exec.label === "Em andamento" ? (
+                            <div className="flex flex-col items-end gap-1">
                               <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
                                 Em andamento
                               </span>
-                              <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                              </span>
+                              <div className="flex items-center gap-2">
+                                <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full bg-emerald-500 rounded-full"
+                                    style={{ width: `${Math.round(exec.perc ?? 0)}%` }}
+                                  />
+                                </div>
+                                <span className="text-[10px] font-mono font-bold text-slate-500">
+                                  {Math.round(exec.perc ?? 0)}%
+                                </span>
+                              </div>
                             </div>
-                            <div className="w-24 h-1.5 bg-slate-100 rounded-full overflow-hidden">
-                              <div className="h-full bg-emerald-500 w-[60%] rounded-full" />
-                            </div>
-                          </div>
+                          ) : (
+                            <span
+                              className={`text-[10px] uppercase font-bold tracking-wider ${
+                                exec.label === "Concluída"
+                                  ? "text-emerald-600"
+                                  : exec.label === "Não iniciada"
+                                    ? "text-slate-500"
+                                    : "text-slate-400"
+                              }`}
+                            >
+                              {exec.label}
+                            </span>
+                          )}
                         </TableCell>
                       </TableRow>
                     );
@@ -443,6 +499,7 @@ export default function MonitoramentoPage() {
             </div>
           </div>
         </div>
+        )}
         <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />
         </footer>
