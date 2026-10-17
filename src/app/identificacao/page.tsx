@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getSections } from "@/services/api";
-import { Loader2, MapPin, Anchor } from "lucide-react";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
+import { isChildOf } from "@/lib/sections";
+import { MapPin, Anchor } from "lucide-react";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { ZoomableImage } from "@/components/zoomable-image";
 
@@ -19,35 +21,22 @@ interface Section {
 export default function IdentificacaoPage() {
   const { selectedReservoir } = useReservoir();
 
-  const [sections, setSections] = useState<Section[]>([]);
-  const [loading, setLoading] = useState(true);
+  const regionId = selectedReservoir?.id;
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const data = await getSections(selectedReservoir.id);
-
-        const sortedData = data
-          .filter((s: Section) => s.number.startsWith("1"))
-          .sort((a: Section, b: Section) =>
-            a.number.localeCompare(b.number, undefined, { numeric: true }),
-          );
-
-        setSections(sortedData);
-      } catch (error) {
-        console.error("Erro ao carregar textos:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [selectedReservoir]);
+  const { data, status, retry } = useAsyncData<Section[]>(
+    regionId
+      ? async () => {
+          const all: Section[] = await getSections(regionId);
+          return all
+            .filter((s) => isChildOf(s.number, "1"))
+            .sort((a, b) =>
+              a.number.localeCompare(b.number, undefined, { numeric: true }),
+            );
+        }
+      : null,
+    [regionId],
+  );
+  const sections: Section[] = status === "ready" && data ? data : [];
 
   const renderContent = (text: string) => {
     if (!text) return null;
@@ -70,19 +59,6 @@ export default function IdentificacaoPage() {
 
     return `${baseUrl}${cleanPath}`;
   };
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-slate-200" />
-          <span className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase italic">
-            Sincronizando Identificação
-          </span>
-        </div>
-      </div>
-    );
-  }
 
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Identificação" />;
@@ -125,6 +101,17 @@ export default function IdentificacaoPage() {
           )}
         </header>
 
+        {status === "loading" || status === "idle" ? (
+          <DataState status="loading" />
+        ) : status === "error" ? (
+          <DataState status="error" onRetry={retry} />
+        ) : sections.length === 0 ? (
+          <DataState
+            status="unavailable"
+            regionName={selectedReservoir.name}
+            unavailableReason="O conteúdo do plano desta região para esta página ainda não foi incorporado ao sistema."
+          />
+        ) : (
         <div className="space-y-5">
           {subSections.map((section) => (
             <article key={section.id} className="relative group">
@@ -156,6 +143,7 @@ export default function IdentificacaoPage() {
             </article>
           ))}
         </div>
+        )}
 
         <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />

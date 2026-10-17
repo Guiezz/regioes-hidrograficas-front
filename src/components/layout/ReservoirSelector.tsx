@@ -7,15 +7,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useReservoir } from "@/context/ReservoirContext";
 
 interface ReservoirSelectorProps {
   fullWidth?: boolean;
 }
 
-export function ReservoirSelector({ fullWidth = false }: ReservoirSelectorProps) {
-  const { reservoirs, selectedReservoir, setSelectedReservoir, isLoading } =
-    useReservoir();
+export function ReservoirSelector({
+  fullWidth = false,
+}: ReservoirSelectorProps) {
+  const {
+    reservoirs,
+    selectedReservoir,
+    setSelectedReservoir,
+    isLoading,
+    loadError,
+    retryReservoirs,
+  } = useReservoir();
 
   if (isLoading) {
     return (
@@ -26,6 +35,30 @@ export function ReservoirSelector({ fullWidth = false }: ReservoirSelectorProps)
             : "w-full h-10 bg-muted animate-pulse rounded-md"
         }
       />
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div
+        className={`flex gap-2 text-destructive ${
+          fullWidth
+            ? "items-center text-sm"
+            : "flex-col items-start gap-0.5 text-[11px] leading-tight"
+        }`}
+      >
+        <span className="whitespace-nowrap">
+          Não foi possível carregar as regiões.
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`shrink-0 whitespace-nowrap ${fullWidth ? "" : "h-6 px-2 text-[11px]"}`}
+          onClick={retryReservoirs}
+        >
+          Tentar novamente
+        </Button>
+      </div>
     );
   }
 

@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getMatriz } from "@/services/api";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
@@ -22,7 +24,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  Loader2,
   MapPin,
   ClipboardList,
   Filter,
@@ -33,42 +34,50 @@ import {
 
 const ITEMS_PER_PAGE = 5;
 
+interface MatrizItem {
+  id: number | string;
+  tipo_matriz?: string;
+  programa?: string;
+  acoes_especificas?: string;
+  instituicoes_envolvidas?: string;
+  prioridade?: string;
+}
+
 export default function MatrizPage() {
   const { selectedReservoir } = useReservoir();
 
-  const [data, setData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const regionId = selectedReservoir?.id;
+  const {
+    data: rawData,
+    status,
+    retry,
+  } = useAsyncData<MatrizItem[]>(regionId ? () => getMatriz(regionId) : null, [
+    regionId,
+  ]);
+  const data = useMemo<MatrizItem[]>(
+    () => (status === "ready" ? (rawData ?? []) : []),
+    [status, rawData],
+  );
 
-  // Estados dos filtros
-  const [filterTipo, setFilterTipo] = useState("all");
-  const [filterPrograma, setFilterPrograma] = useState("all");
-
-  const [currentPage, setCurrentPage] = useState(1);
-
-  useEffect(() => {
-    async function fetchData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const res = await getMatriz(selectedReservoir.id);
-        setData(res || []);
-      } catch (error) {
-        console.error("Erro ao carregar matriz:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [selectedReservoir]);
-
-  // Resetar página quando os filtros mudarem
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [filterTipo, filterPrograma]);
+  // Filtros e página; zerados ao trocar de região (ajuste durante a renderização)
+  const [view, setView] = useState({
+    regionId,
+    tipo: "all",
+    programa: "all",
+    page: 1,
+  });
+  if (view.regionId !== regionId) {
+    setView({ regionId, tipo: "all", programa: "all", page: 1 });
+  }
+  const filterTipo = view.tipo;
+  const filterPrograma = view.programa;
+  const currentPage = view.page;
+  const setFilterTipo = (tipo: string) =>
+    setView((v) => ({ ...v, tipo, page: 1 }));
+  const setFilterPrograma = (programa: string) =>
+    setView((v) => ({ ...v, programa, page: 1 }));
+  const setCurrentPage = (fn: (prev: number) => number) =>
+    setView((v) => ({ ...v, page: fn(v.page) }));
 
   const tiposMatriz = useMemo(
     () =>
@@ -99,7 +108,7 @@ export default function MatrizPage() {
     currentPage * ITEMS_PER_PAGE,
   );
 
-  const getPriorityBadge = (priority: string) => {
+  const getPriorityBadge = (priority?: string) => {
     const p = priority?.toLowerCase() || "";
     if (p.includes("alta"))
       return <Badge className="bg-red-500 hover:bg-red-600">Alta</Badge>;
@@ -113,22 +122,21 @@ export default function MatrizPage() {
     setFilterPrograma("all");
   };
 
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-200" />
-          <span className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase italic">
-            Carregando Matriz de Ações
-          </span>
-        </div>
-      </div>
-    );
-  }
-
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Matriz de Ação" />;
   }
+
+  const filtersActive = filterTipo !== "all" || filterPrograma !== "all";
+  const dataStatus =
+    status === "ready"
+      ? data.length === 0
+        ? "unavailable"
+        : filteredData.length === 0 && filtersActive
+          ? "empty"
+          : "ready"
+      : status === "error"
+        ? "error"
+        : "loading";
 
   return (
     <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900">
@@ -165,146 +173,158 @@ export default function MatrizPage() {
         </header>
 
         {/* Filtros */}
-        <section className="mb-12 mx-4 md:mx-0 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-slate-50 border border-slate-100 w-[calc(100%-2rem)] md:w-full items-end">
-          {/* Filtro Tipo de Matriz */}
-          <div className="space-y-2 w-full overflow-hidden">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-              <Filter className="w-3 h-3" /> Tipo de Matriz
-            </label>
-            <Select value={filterTipo} onValueChange={setFilterTipo}>
-              {/* O [&>span]:truncate garante que o texto interno receba os "..." em vez de esticar o botão */}
-              <SelectTrigger className="bg-white border-slate-200 w-full h-10 [&>span]:truncate">
-                <SelectValue placeholder="Selecione o tipo" />
-              </SelectTrigger>
-              <SelectContent className="max-w-[calc(100vw-2rem)] md:max-w-100">
-                <SelectItem value="all">Todos os Tipos</SelectItem>
-                {tiposMatriz.map((tipo) => (
-                  <SelectItem key={tipo} value={tipo} className="truncate">
-                    {tipo}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+        {dataStatus !== "unavailable" && (
+          <section className="mb-12 mx-4 md:mx-0 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-slate-50 border border-slate-100 w-[calc(100%-2rem)] md:w-full items-end">
+            {/* Filtro Tipo de Matriz */}
+            <div className="space-y-2 w-full overflow-hidden">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                <Filter className="w-3 h-3" /> Eixo
+              </label>
+              <Select value={filterTipo} onValueChange={setFilterTipo}>
+                {/* O [&>span]:truncate garante que o texto interno receba os "..." em vez de esticar o botão */}
+                <SelectTrigger className="bg-white border-slate-200 w-full h-10 [&>span]:truncate">
+                  <SelectValue placeholder="Selecione o eixo" />
+                </SelectTrigger>
+                <SelectContent className="max-w-[calc(100vw-2rem)] md:max-w-100">
+                  <SelectItem value="all">Todos os Eixos</SelectItem>
+                  {tiposMatriz.map((tipo) => (
+                    <SelectItem key={tipo} value={tipo} className="truncate">
+                      {tipo}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Filtro Programa */}
-          <div className="space-y-2 w-full overflow-hidden">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
-              <ClipboardList className="w-3 h-3" /> Programa
-            </label>
-            <Select value={filterPrograma} onValueChange={setFilterPrograma}>
-              <SelectTrigger className="bg-white border-slate-200 w-full h-10 [&>span]:truncate">
-                <SelectValue placeholder="Selecione o programa" />
-              </SelectTrigger>
-              <SelectContent className="max-w-[calc(100vw-2rem)] md:max-w-100">
-                <SelectItem value="all">Todos os Programas</SelectItem>
-                {programas.map((prog) => (
-                  <SelectItem key={prog} value={prog} className="truncate">
-                    {prog}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+            {/* Filtro Programa */}
+            <div className="space-y-2 w-full overflow-hidden">
+              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                <ClipboardList className="w-3 h-3" /> Programa
+              </label>
+              <Select value={filterPrograma} onValueChange={setFilterPrograma}>
+                <SelectTrigger className="bg-white border-slate-200 w-full h-10 [&>span]:truncate">
+                  <SelectValue placeholder="Selecione o programa" />
+                </SelectTrigger>
+                <SelectContent className="max-w-[calc(100vw-2rem)] md:max-w-100">
+                  <SelectItem value="all">Todos os Programas</SelectItem>
+                  {programas.map((prog) => (
+                    <SelectItem key={prog} value={prog} className="truncate">
+                      {prog}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* Botão de Limpar Filtros */}
-          <Button
-            variant="outline"
-            onClick={clearFilters}
-            className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-[10px] font-bold tracking-widest mt-2 lg:mt-0"
-          >
-            <X className="w-3 h-3 mr-2" /> Limpar Filtros
-          </Button>
-        </section>
+            {/* Botão de Limpar Filtros */}
+            <Button
+              variant="outline"
+              onClick={clearFilters}
+              className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-[10px] font-bold tracking-widest mt-2 lg:mt-0"
+            >
+              <X className="w-3 h-3 mr-2" /> Limpar Filtros
+            </Button>
+          </section>
+        )}
 
         {/* Tabela com scroll responsivo travado na largura da tela */}
-        <div className="rounded-2xl border border-slate-200 shadow-sm bg-white flex flex-col w-full max-w-[calc(100vw-2rem)] md:max-w-full overflow-hidden mb-6">
-          <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
-            <Table className="w-full table-fixed min-w-225">
-              <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
-                <TableRow className="border-slate-200">
-                  <TableHead className="w-[45%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
-                    Ação Específica
-                  </TableHead>
-                  <TableHead className="w-[35%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
-                    Responsáveis
-                  </TableHead>
-                  <TableHead className="w-[20%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">
-                    Prioridade
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedData.length > 0 ? (
-                  paginatedData.map((item) => (
-                    <TableRow
-                      key={item.id}
-                      className="group hover:bg-blue-50/30 border-slate-100"
-                    >
-                      <TableCell className="px-5 py-5 align-top">
-                        <div className="space-y-1">
-                          <p className="text-[15px] font-semibold text-slate-800 leading-snug whitespace-normal wrap-break-word hyphens-auto">
-                            {item.acoes_especificas}
+        <DataState
+          status={dataStatus}
+          onRetry={retry}
+          onClearFilters={clearFilters}
+          regionName={selectedReservoir.name}
+          unavailableReason="A Matriz de Ação desta região ainda está sendo incorporada ao sistema a partir do plano oficial."
+        >
+          <div className="rounded-2xl border border-slate-200 shadow-sm bg-white flex flex-col w-full max-w-[calc(100vw-2rem)] md:max-w-full overflow-hidden mb-6">
+            <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
+              <Table className="w-full table-fixed min-w-225">
+                <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
+                  <TableRow className="border-slate-200">
+                    <TableHead className="w-[45%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                      Ação Específica
+                    </TableHead>
+                    <TableHead className="w-[35%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                      Responsáveis
+                    </TableHead>
+                    <TableHead className="w-[20%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">
+                      Prioridade
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {paginatedData.length > 0 ? (
+                    paginatedData.map((item) => (
+                      <TableRow
+                        key={item.id}
+                        className="group hover:bg-blue-50/30 border-slate-100"
+                      >
+                        <TableCell className="px-5 py-5 align-top">
+                          <div className="space-y-1">
+                            <p className="text-[15px] font-semibold text-slate-800 leading-snug whitespace-normal wrap-break-word hyphens-auto">
+                              {item.acoes_especificas}
+                            </p>
+                            <p className="text-[11px] text-blue-500 font-bold uppercase tracking-wider whitespace-normal wrap-break-word">
+                              {item.programa}
+                            </p>
+                          </div>
+                        </TableCell>
+                        <TableCell className="px-5 py-5 align-top">
+                          <p className="text-sm text-slate-600 leading-relaxed whitespace-normal wrap-break-word hyphens-auto">
+                            {item.instituicoes_envolvidas}
                           </p>
-                          <p className="text-[11px] text-blue-500 font-bold uppercase tracking-wider whitespace-normal wrap-break-word">
-                            {item.programa}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell className="px-5 py-5 align-top">
-                        <p className="text-sm text-slate-600 leading-relaxed whitespace-normal wrap-break-word hyphens-auto">
-                          {item.instituicoes_envolvidas}
-                        </p>
-                      </TableCell>
-                      <TableCell className="px-5 py-5 align-top text-center">
-                        {getPriorityBadge(item.prioridade)}
+                        </TableCell>
+                        <TableCell className="px-5 py-5 align-top text-center">
+                          {getPriorityBadge(item.prioridade)}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell
+                        colSpan={3}
+                        className="h-40 text-center text-slate-400 italic"
+                      >
+                        Nenhuma ação encontrada.
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      className="h-40 text-center text-slate-400 italic"
-                    >
-                      Nenhuma ação encontrada.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-
-        {/* Controles de Paginação */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-2">
-            <p className="text-sm text-slate-500">
-              Página <span className="font-medium">{currentPage}</span> de{" "}
-              <span className="font-medium">{totalPages}</span>
-            </p>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-                disabled={currentPage === 1}
-              >
-                <ChevronLeft className="h-4 w-4 mr-1" /> Anterior
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-                }
-                disabled={currentPage === totalPages}
-              >
-                Próxima <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
+                  )}
+                </TableBody>
+              </Table>
             </div>
           </div>
-        )}
+
+          {/* Controles de Paginação */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-2">
+              <p className="text-sm text-slate-500">
+                Página <span className="font-medium">{currentPage}</span> de{" "}
+                <span className="font-medium">{totalPages}</span>
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                >
+                  <ChevronLeft className="h-4 w-4 mr-1" /> Anterior
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                >
+                  Próxima <ChevronRight className="h-4 w-4 ml-1" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </DataState>
 
         <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />

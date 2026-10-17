@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
-import { getCustos, PlanoAcaoResponse } from "@/services/api";
+import { getCustos } from "@/services/api";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
 import {
   Table,
   TableBody,
@@ -21,7 +23,6 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
-  Loader2,
   MapPin,
   Info,
   DollarSign,
@@ -117,63 +118,29 @@ function KpiCard({
 /* ─── Componente Principal ─────────────────────────────────────────────────── */
 export default function CustosPage() {
   const { selectedReservoir } = useReservoir();
-  const [data, setData] = useState<PlanoAcaoResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeEixo, setActiveEixo] = useState<string>("");
-  const [ready, setReady] = useState(false);
+  const regionId = selectedReservoir?.id;
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      setReady(false);
-      try {
-        const res = await getCustos(selectedReservoir.id);
-        setData(res);
-        if (res?.planoAcao?.[0]) setActiveEixo(res.planoAcao[0].eixo);
-      } catch (e) {
-        console.error("Erro ao carregar custos:", e);
-      } finally {
-        setLoading(false);
-        setTimeout(() => setReady(true), 60);
-      }
-    }
-    fetchData();
-  }, [selectedReservoir]);
-
-  /* ── Loading ── */
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#fafafa]">
-        <div className="flex flex-col items-center gap-5">
-          <div className="relative">
-            <div className="absolute inset-0 rounded-full bg-sky-100 animate-ping opacity-50" />
-            <Loader2 className="relative h-7 w-7 animate-spin text-sky-400" />
-          </div>
-          <span className="text-[10px] font-bold tracking-[0.35em] text-slate-300 uppercase">
-            Calculando Investimentos
-          </span>
-        </div>
-      </div>
-    );
+  // Eixo selecionado; zerado ao trocar de região (ajuste durante a renderização)
+  const [eixoView, setEixoView] = useState({ regionId, eixo: "" });
+  if (eixoView.regionId !== regionId) {
+    setEixoView({ regionId, eixo: "" });
   }
+  const setActiveEixo = (eixo: string) => setEixoView((v) => ({ ...v, eixo }));
+
+  const { data, status, retry } = useAsyncData(
+    regionId ? () => getCustos(regionId) : null,
+    [regionId],
+  );
 
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Previsão de Custos" />;
   }
 
-  if (!data?.planoAcao) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-[#fafafa] text-slate-300 text-sm">
-        Nenhum dado financeiro disponível.
-      </div>
-    );
-  }
-
-  const eixoAtual = data.planoAcao.find((e) => e.eixo === activeEixo);
+  const planoAcao = status === "ready" ? (data?.planoAcao ?? []) : [];
+  const activeEixo = planoAcao.some((e) => e.eixo === eixoView.eixo)
+    ? eixoView.eixo
+    : (planoAcao[0]?.eixo ?? "");
+  const eixoAtual = planoAcao.find((e) => e.eixo === activeEixo);
 
   return (
     <>
@@ -182,9 +149,7 @@ export default function CustosPage() {
       <div className="min-h-screen bg-white selection:bg-sky-100 selection:text-sky-900">
         <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
           {/* ══ HEADER ══════════════════════════════════════════════════════════ */}
-          <header
-            className={`mb-16 transition-opacity duration-500 ${ready ? "opacity-100" : "opacity-0"}`}
-          >
+          <header>
             {/* Eyebrow */}
             <div
               className="anim-fade-up flex items-center gap-3 mb-8"
@@ -217,13 +182,28 @@ export default function CustosPage() {
               </div>
             </div>
 
+          </header>
+
+          {status === "loading" || status === "idle" ? (
+            <DataState status="loading" />
+          ) : status === "error" ? (
+            <DataState status="error" onRetry={retry} />
+          ) : planoAcao.length === 0 ? (
+            <DataState
+              status="unavailable"
+              regionName={selectedReservoir.name}
+              unavailableReason="A previsão de custos desta região ainda não foi incorporada ao sistema."
+            />
+          ) : (
+          <>
+          <div className="mb-16">
             {/* KPIs */}
             <div className="grid grid-cols-1 md:grid-cols-8 gap-4 pt-10 border-t border-slate-100">
               {/* Investimento Total - 5 Colunas */}
               <div className="md:col-span-3">
                 <KpiCard
                   label="Investimento Total"
-                  value={fmtBRL(data.resumoGeral.valorTotalPrevisto)}
+                  value={fmtBRL(data?.resumoGeral?.valorTotalPrevisto ?? 0)}
                   sub="Previsão consolidada até 2050"
                   icon={<DollarSign className="w-4 h-4" />}
                   accent="sky"
@@ -235,7 +215,7 @@ export default function CustosPage() {
               <div className="md:col-span-2">
                 <KpiCard
                   label="Eixos"
-                  value={String(data.planoAcao.length)}
+                  value={String(planoAcao.length)}
                   sub="Atuação"
                   icon={<Layers className="w-4 h-4" />}
                   accent="blue"
@@ -249,7 +229,7 @@ export default function CustosPage() {
                   label="Maior Aporte"
                   value={fmtBRL(
                     Math.max(
-                      ...data.planoAcao.map((e) => e.valorTotalProjetado),
+                      ...planoAcao.map((e) => e.valorTotalProjetado),
                     ),
                   )}
                   sub="Representatividade máxima"
@@ -275,7 +255,7 @@ export default function CustosPage() {
                 </span>
               </div>
             </div>
-          </header>
+          </div>
 
           {/* ══ NAVEGAÇÃO ════════════════════════════════════════════════════════ */}
 
@@ -289,7 +269,7 @@ export default function CustosPage() {
                 <SelectValue placeholder="Selecione um eixo" />
               </SelectTrigger>
               <SelectContent className="rounded-2xl">
-                {data.planoAcao.map((e) => (
+                {planoAcao.map((e) => (
                   <SelectItem
                     key={e.eixo}
                     value={e.eixo}
@@ -309,7 +289,7 @@ export default function CustosPage() {
                 className="bg-white border border-slate-100 shadow-[0_2px_14px_0_rgba(0,0,0,0.06)]
                                    p-1.5 rounded-2xl inline-flex gap-1"
               >
-                {data.planoAcao.map((e) => (
+                {planoAcao.map((e) => (
                   <TabsTrigger
                     key={e.eixo}
                     value={e.eixo}
@@ -322,7 +302,7 @@ export default function CustosPage() {
                   </TabsTrigger>
                 ))}
               </TabsList>
-              {data.planoAcao.map((e) => (
+              {planoAcao.map((e) => (
                 <TabsContent key={e.eixo} value={e.eixo} className="hidden" />
               ))}
             </Tabs>
@@ -503,6 +483,9 @@ export default function CustosPage() {
                 ))}
               </div>
             </div>
+          )}
+
+          </>
           )}
 
           {/* ══ FOOTER ══════════════════════════════════════════════════════════ */}

@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getSections, getKpis } from "@/services/api";
 import type { KPIItem, KPIResponse } from "@/services/api";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
+import { isChildOf } from "@/lib/sections";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Loader2,
   MapPin, Building2, Activity, Waves, Scale,
   Droplets, CheckCircle2, AlertTriangle, TrendingDown,
   TrendingUp, Users, Sprout, Factory, Thermometer,
@@ -152,36 +154,30 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
 
 export default function SituacaoHidricaPage() {
   const { selectedReservoir } = useReservoir();
-  const [kpis, setKpis] = useState<KPIResponse>({});
-  const [sections, setSections] = useState<Section[]>([]);
-  const [loading, setLoading] = useState(true);
+  const regionId = selectedReservoir?.id;
   const [activeTab, setActiveTab] = useState<TabKey>("infraestrutura");
 
-  useEffect(() => {
-    async function fetchData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const [kpiData, sectionData] = await Promise.all([
-          getKpis(selectedReservoir.id),
-          getSections(selectedReservoir.id),
-        ]);
-        setKpis(kpiData);
-        const sorted = sectionData.sort((a: Section, b: Section) =>
-          a.number.localeCompare(b.number, undefined, { numeric: true })
-        );
-        setSections(sorted);
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, [selectedReservoir]);
+  const { data, status, retry } = useAsyncData<{
+    kpis: KPIResponse;
+    sections: Section[];
+  }>(
+    regionId
+      ? async () => {
+          const [kpiData, sectionData] = await Promise.all([
+            getKpis(regionId),
+            getSections(regionId),
+          ]);
+          const sorted = [...sectionData].sort((a: Section, b: Section) =>
+            a.number.localeCompare(b.number, undefined, { numeric: true }),
+          );
+          return { kpis: kpiData, sections: sorted };
+        }
+      : null,
+    [regionId],
+  );
+  const ready = status === "ready" && !!data;
+  const kpis: KPIResponse = ready ? data.kpis : {};
+  const sections: Section[] = ready ? data.sections : [];
 
   const renderContent = useCallback((text: string) => {
     if (!text) return null;
@@ -204,26 +200,14 @@ export default function SituacaoHidricaPage() {
   }, []);
 
   const config = TAB_CONFIG[activeTab];
-  const currentKPIs = [
-    ...(kpis[activeTab]?.atual || []),
-    ...(kpis[activeTab]?.futuro || []),
-  ];
-  const tabSections = sections.filter((s) => s.number.startsWith(config.chapter));
+  const tabSections = sections.filter((s) => isChildOf(s.number, config.chapter));
+  const hasAnyData =
+    sections.length > 0 ||
+    (Object.keys(TAB_CONFIG) as TabKey[]).some(
+      (k) => (kpis[k]?.atual?.length ?? 0) + (kpis[k]?.futuro?.length ?? 0) > 0,
+    );
   const mainTitle = tabSections.find((s) => s.level === 1);
   const topLevelSections = tabSections.filter((s) => s.level === 2);
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-200" />
-          <span className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase italic">
-            Analisando Situação Hídrica
-          </span>
-        </div>
-      </div>
-    );
-  }
 
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Situação Hídrica" />;
@@ -254,37 +238,44 @@ export default function SituacaoHidricaPage() {
           </div>
         </header>
 
-        {currentKPIs.length === 0 && topLevelSections.length === 0 ? (
-          <div className="text-center py-20 text-slate-400">
-            <p>Nenhum dado encontrado para esta bacia.</p>
+        <div className="sticky top-4 z-20 mb-12 overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as TabKey)}
+            >
+              <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
+                {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
+                  ([key, cfg]) => (
+                    <TabsTrigger
+                      key={key}
+                      value={key}
+                      className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <cfg.icon className="w-3.5 h-3.5" />
+                      <span className="hidden md:inline">{cfg.label}</span>
+                      <span className="md:hidden">{cfg.sectionLabel}</span>
+                    </TabsTrigger>
+                  ),
+                )}
+              </TabsList>
+            </Tabs>
           </div>
+        </div>
+
+
+        {status === "loading" || status === "idle" ? (
+          <DataState status="loading" />
+        ) : status === "error" ? (
+          <DataState status="error" onRetry={retry} />
+        ) : !hasAnyData ? (
+          <DataState
+            status="unavailable"
+            regionName={selectedReservoir.name}
+            unavailableReason="O conteúdo do plano desta região para esta página ainda não foi incorporado ao sistema."
+          />
         ) : (
           <>
-            <div className="sticky top-4 z-20 mb-12 overflow-hidden">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <Tabs
-                  value={activeTab}
-                  onValueChange={(v) => setActiveTab(v as TabKey)}
-                >
-                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
-                    {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
-                      ([key, cfg]) => (
-                        <TabsTrigger
-                          key={key}
-                          value={key}
-                          className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
-                        >
-                          <cfg.icon className="w-3.5 h-3.5" />
-                          <span className="hidden md:inline">{cfg.label}</span>
-                          <span className="md:hidden">{cfg.sectionLabel}</span>
-                        </TabsTrigger>
-                      ),
-                    )}
-                  </TabsList>
-                </Tabs>
-              </div>
-            </div>
-
             <Tabs
               value={activeTab}
               onValueChange={(v) => setActiveTab(v as TabKey)}
@@ -349,7 +340,7 @@ export default function SituacaoHidricaPage() {
                       <div className="space-y-16">
                         {topLevelSections.map((section) => {
                           const children = tabSections.filter(
-                            (s) => s.level === 3 && s.number.startsWith(section.number),
+                            (s) => s.level === 3 && s.number.startsWith(section.number + "."),
                           );
                           return (
                             <article key={section.id} className="space-y-8">
@@ -371,7 +362,7 @@ export default function SituacaoHidricaPage() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {children.map((child) => {
                                     const subItems = tabSections.filter(
-                                      (s) => s.level === 4 && s.number.startsWith(child.number),
+                                      (s) => s.level === 4 && s.number.startsWith(child.number + "."),
                                     );
                                     return (
                                       <div

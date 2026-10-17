@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getReservoirs, ReservoirData } from "@/services/api"; // Importe a função criada acima
 
@@ -9,6 +9,8 @@ interface ReservoirContextType {
   reservoirs: ReservoirData[];
   setSelectedReservoir: (reservoir: ReservoirData | null) => void;
   isLoading: boolean;
+  loadError: boolean;
+  retryReservoirs: () => void;
 }
 
 const ReservoirContext = createContext<ReservoirContextType | undefined>(
@@ -23,10 +25,15 @@ export function ReservoirProvider({ children }: { children: React.ReactNode }) {
   const [selectedReservoir, setSelectedReservoirState] =
     useState<ReservoirData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+  const retryReservoirs = useCallback(() => setAttempt((n) => n + 1), []);
 
   // 1. Busca a lista de reservatórios na API ao iniciar
   useEffect(() => {
     async function loadData() {
+      setIsLoading(true);
+      setLoadError(false);
       try {
         const data = await getReservoirs();
         setReservoirs(data);
@@ -48,12 +55,15 @@ export function ReservoirProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (error) {
         console.error("Erro ao carregar contexto de reservatórios:", error);
+        setLoadError(true);
       } finally {
         setIsLoading(false);
       }
     }
     loadData();
-  }, []); // Roda apenas uma vez na montagem
+    // searchParams é lido só na carga inicial/retentativa
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [attempt]);
 
   // 2. Função para atualizar o estado e a URL
   const setSelectedReservoir = (reservoir: ReservoirData | null) => {
@@ -90,6 +100,8 @@ export function ReservoirProvider({ children }: { children: React.ReactNode }) {
         reservoirs,
         setSelectedReservoir,
         isLoading,
+        loadError,
+        retryReservoirs,
       }}
     >
       {children}
