@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 // 1. Troca de useSearchParams para useReservoir
 import { useReservoir } from "@/context/ReservoirContext";
 import { getRadarData, getConsolidated } from "@/services/api";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, PieChart, Target, Activity } from "lucide-react";
 import {
@@ -76,6 +77,10 @@ export default function IndicadoresPage() {
   const globalIndex = consolidated?.indice_global
     ? (consolidated.indice_global * 100).toFixed(1)
     : "0.0";
+
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Indicadores" />;
+  }
 
   if (loading) {
     return (

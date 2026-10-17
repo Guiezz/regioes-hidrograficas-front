@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getSections } from "@/services/api";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
 import {
   Card,
   CardContent,
@@ -47,56 +49,36 @@ function getImageUrl(imagePath?: string): string {
 export default function HomePage() {
   const { selectedReservoir } = useReservoir();
   const [selectedMapType, setSelectedMapType] = useState<"1.2" | "1.3">("1.2");
-  const [map12, setMap12] = useState<BasinMapInfo | null>(null);
-  const [map13, setMap13] = useState<BasinMapInfo | null>(null);
-  const [isLoadingMap, setIsLoadingMap] = useState<boolean>(false);
-
-  useEffect(() => {
-    async function fetchBasinMaps() {
-      if (!selectedReservoir?.id) {
-        setMap12(null);
-        setMap13(null);
-        setIsLoadingMap(false);
-        return;
-      }
-      setIsLoadingMap(true);
-      try {
-        const sections = await getSections(selectedReservoir.id);
-        const sec12 = sections.find(
-          (s: { number: string; image?: string; title: string }) =>
-            s.number === "1.2" && s.image,
-        );
-        const sec13 = sections.find(
-          (s: { number: string; image?: string; title: string }) =>
-            s.number === "1.3" && s.image,
-        );
-
-        setMap12(
-          sec12
-            ? {
-                url: getImageUrl(sec12.image),
-                title: sec12.title,
-                number: sec12.number,
-              }
-            : null,
-        );
-        setMap13(
-          sec13
-            ? {
-                url: getImageUrl(sec13.image),
-                title: sec13.title,
-                number: sec13.number,
-              }
-            : null,
-        );
-      } catch (err) {
-        console.error("Erro ao carregar mapas da identificação:", err);
-      } finally {
-        setIsLoadingMap(false);
-      }
-    }
-    fetchBasinMaps();
-  }, [selectedReservoir?.id]);
+  const {
+    data: maps,
+    status: mapStatus,
+    retry,
+  } = useAsyncData<{ map12: BasinMapInfo | null; map13: BasinMapInfo | null }>(
+    selectedReservoir?.id
+      ? async () => {
+          const sections = await getSections(selectedReservoir.id);
+          const toInfo = (num: string): BasinMapInfo | null => {
+            const sec = sections.find(
+              (s: { number: string; image?: string; title: string }) =>
+                s.number === num && s.image,
+            );
+            return sec
+              ? {
+                  url: getImageUrl(sec.image),
+                  title: sec.title,
+                  number: sec.number,
+                }
+              : null;
+          };
+          return { map12: toInfo("1.2"), map13: toInfo("1.3") };
+        }
+      : null,
+    [selectedReservoir?.id],
+  );
+  const map12 = mapStatus === "ready" ? (maps?.map12 ?? null) : null;
+  const map13 = mapStatus === "ready" ? (maps?.map13 ?? null) : null;
+  const isLoadingMap = mapStatus === "loading";
+  const isMapError = mapStatus === "error";
 
   const activeMap = selectedMapType === "1.3" && map13 ? map13 : map12 || map13;
 
@@ -254,6 +236,12 @@ export default function HomePage() {
                     <Loader2 className="h-6 w-6 animate-spin text-[#005384]" />
                     <span className="text-xs font-medium">Carregando mapa técnico...</span>
                   </div>
+                ) : selectedReservoir && isMapError ? (
+                  <DataState
+                    status="error"
+                    errorMessage="Não foi possível carregar o mapa desta região."
+                    onRetry={retry}
+                  />
                 ) : selectedReservoir && activeMap?.url ? (
                   <Image
                     key={activeMap.url}
