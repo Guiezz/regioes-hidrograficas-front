@@ -155,15 +155,7 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
 export default function SituacaoHidricaPage() {
   const { selectedReservoir } = useReservoir();
   const regionId = selectedReservoir?.id;
-  const [view, setView] = useState<{ regionId?: number; tab: TabKey }>({
-    regionId,
-    tab: "infraestrutura",
-  });
-  if (view.regionId !== regionId) {
-    setView({ regionId, tab: "infraestrutura" });
-  }
-  const activeTab = view.regionId === regionId ? view.tab : "infraestrutura";
-  const setActiveTab = (tab: TabKey) => setView({ regionId, tab });
+  const [activeTab, setActiveTab] = useState<TabKey>("infraestrutura");
 
   const { data, status, retry } = useAsyncData<{
     kpis: KPIResponse;
@@ -246,39 +238,44 @@ export default function SituacaoHidricaPage() {
           </div>
         </header>
 
+        <div className="sticky top-4 z-20 mb-12 overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <Tabs
+              value={activeTab}
+              onValueChange={(v) => setActiveTab(v as TabKey)}
+            >
+              <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
+                {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
+                  ([key, cfg]) => (
+                    <TabsTrigger
+                      key={key}
+                      value={key}
+                      className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
+                    >
+                      <cfg.icon className="w-3.5 h-3.5" />
+                      <span className="hidden md:inline">{cfg.label}</span>
+                      <span className="md:hidden">{cfg.sectionLabel}</span>
+                    </TabsTrigger>
+                  ),
+                )}
+              </TabsList>
+            </Tabs>
+          </div>
+        </div>
+
+
         {status === "loading" || status === "idle" ? (
           <DataState status="loading" />
         ) : status === "error" ? (
           <DataState status="error" onRetry={retry} />
         ) : !hasAnyData ? (
-          <DataState status="empty" />
+          <DataState
+            status="unavailable"
+            regionName={selectedReservoir.name}
+            unavailableReason="O conteúdo do plano desta região para esta página ainda não foi incorporado ao sistema."
+          />
         ) : (
           <>
-            <div className="sticky top-4 z-20 mb-12 overflow-hidden">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <Tabs
-                  value={activeTab}
-                  onValueChange={(v) => setActiveTab(v as TabKey)}
-                >
-                  <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
-                    {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
-                      ([key, cfg]) => (
-                        <TabsTrigger
-                          key={key}
-                          value={key}
-                          className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
-                        >
-                          <cfg.icon className="w-3.5 h-3.5" />
-                          <span className="hidden md:inline">{cfg.label}</span>
-                          <span className="md:hidden">{cfg.sectionLabel}</span>
-                        </TabsTrigger>
-                      ),
-                    )}
-                  </TabsList>
-                </Tabs>
-              </div>
-            </div>
-
             <Tabs
               value={activeTab}
               onValueChange={(v) => setActiveTab(v as TabKey)}

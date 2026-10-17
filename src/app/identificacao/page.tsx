@@ -106,7 +106,11 @@ export default function IdentificacaoPage() {
         ) : status === "error" ? (
           <DataState status="error" onRetry={retry} />
         ) : sections.length === 0 ? (
-          <DataState status="empty" />
+          <DataState
+            status="unavailable"
+            regionName={selectedReservoir.name}
+            unavailableReason="O conteúdo do plano desta região para esta página ainda não foi incorporado ao sistema."
+          />
         ) : (
         <div className="space-y-5">
           {subSections.map((section) => (
