@@ -6,7 +6,8 @@ export type AsyncStatus = "idle" | "loading" | "error" | "ready";
 
 /**
  * Executa `load` sempre que `deps` mudar. `load === null` => "idle".
- * Mantém `data` anterior durante um novo "loading" e descarta respostas
+ * Ao mudar `deps` o status vira "loading" (e `data` é limpo) já no mesmo
+ * render, sem frame com dados da chave anterior. Descarta respostas
  * obsoletas (contador de requisição).
  */
 export function useAsyncData<T>(
@@ -17,6 +18,16 @@ export function useAsyncData<T>(
   const [status, setStatus] = useState<AsyncStatus>(load ? "loading" : "idle");
   const [attempt, setAttempt] = useState(0);
   const requestId = useRef(0);
+  const key: unknown[] = [...deps, attempt];
+  const [lastKey, setLastKey] = useState<unknown[]>(key);
+  if (
+    key.length !== lastKey.length ||
+    key.some((v, i) => !Object.is(v, lastKey[i]))
+  ) {
+    setLastKey(key);
+    setStatus(load ? "loading" : "idle");
+    setData(undefined);
+  }
   const loadRef = useRef(load);
   loadRef.current = load;
 
