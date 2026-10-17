@@ -14,7 +14,9 @@ interface ReservoirSelectorProps {
   fullWidth?: boolean;
 }
 
-export function ReservoirSelector({ fullWidth = false }: ReservoirSelectorProps) {
+export function ReservoirSelector({
+  fullWidth = false,
+}: ReservoirSelectorProps) {
   const {
     reservoirs,
     selectedReservoir,
@@ -38,9 +40,22 @@ export function ReservoirSelector({ fullWidth = false }: ReservoirSelectorProps)
 
   if (loadError) {
     return (
-      <div className="flex items-center gap-2 text-sm text-destructive">
-        <span>Não foi possível carregar as regiões.</span>
-        <Button variant="outline" size="sm" onClick={retryReservoirs}>
+      <div
+        className={`flex gap-2 text-destructive ${
+          fullWidth
+            ? "items-center text-sm"
+            : "flex-col items-start gap-0.5 text-[11px] leading-tight"
+        }`}
+      >
+        <span className="whitespace-nowrap">
+          Não foi possível carregar as regiões.
+        </span>
+        <Button
+          variant="outline"
+          size="sm"
+          className={`shrink-0 whitespace-nowrap ${fullWidth ? "" : "h-6 px-2 text-[11px]"}`}
+          onClick={retryReservoirs}
+        >
           Tentar novamente
         </Button>
       </div>
