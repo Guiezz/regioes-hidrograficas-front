@@ -146,7 +146,7 @@ Todas as linhas com `acoes_especificas` preenchida e `prioridade` ∈ {Alta, Mé
 
 ## 5. Entrega
 
-- Back: branch `fix/importacao-matriz-medicoes` em `regioes-hidrograficas-api`, PR para a branch padrão do repo; reimportação local feita pelo Back.
+- Back: branch `fix/importacao-matriz-medicoes` em `regioes-hidrograficas-api`, PR para `main`; reimportação local feita pelo Back.
 - Front: branch `feat/estados-honestos` em `regioes-hidrograficas-web`, PR para `dev`.
 - Os dois PRs são independentes: o front já trata Matriz vazia como indisponível e medições vazias como "sem medição".
 
