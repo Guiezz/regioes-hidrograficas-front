@@ -1,9 +1,5 @@
 import axios from "axios";
 
-console.log("--- DEBUG DE AMBIENTE ---");
-console.log("Variável lida:", process.env.NEXT_PUBLIC_API_URL);
-console.log("Ambiente:", process.env.NODE_ENV);
-
 // 1. Configuração da instância do axios
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1",
@@ -89,31 +85,21 @@ export const getBasinById = async (id: string) => {
 };
 
 export async function getActions(basinId = 1, filters?: ActionsFilters) {
-  try {
-    const params: any = { basin_id: basinId };
+  const params: Record<string, string | number> = { basin_id: basinId };
 
-    if (filters?.eixo && filters.eixo !== "todos") params.eixo = filters.eixo;
-    if (filters?.programa && filters.programa !== "todos")
-      params.programa = filters.programa;
-    if (filters?.tipologia && filters.tipologia !== "todos")
-      params.tipologia = filters.tipologia;
+  if (filters?.eixo && filters.eixo !== "todos") params.eixo = filters.eixo;
+  if (filters?.programa && filters.programa !== "todos")
+    params.programa = filters.programa;
+  if (filters?.tipologia && filters.tipologia !== "todos")
+    params.tipologia = filters.tipologia;
 
-    const res = await api.get("/actions", { params });
-    return res.data.data || res.data || [];
-  } catch (error) {
-    console.warn("Erro ao buscar ações:", error);
-    return [];
-  }
+  const res = await api.get("/actions", { params });
+  return res.data.data || res.data || [];
 }
 
 export const getReservoirs = async (): Promise<ReservoirData[]> => {
-  try {
-    const response = await api.get<ReservoirData[]>("/basins");
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao buscar reservatórios:", error);
-    return [];
-  }
+  const response = await api.get<ReservoirData[]>("/basins");
+  return response.data;
 };
 
 export async function getRadarData(basinId = 1) {
@@ -136,29 +122,19 @@ export async function getSections(basinId = 1) {
 }
 
 export const getMatriz = async (basinId?: number) => {
-  try {
-    const params = basinId ? { basin_id: basinId } : {};
-    const response = await api.get("/financeiro/matriz", { params });
-    return response.data?.data || response.data || [];
-  } catch (error) {
-    console.error("Erro ao buscar matriz:", error);
-    return [];
-  }
+  const params = basinId ? { basin_id: basinId } : {};
+  const response = await api.get("/financeiro/matriz", { params });
+  return response.data?.data || response.data || [];
 };
 
 // Custos (Financeiro) - ATUALIZADO PARA O NOVO MODELO
 export const getCustos = async (
   basinId?: number,
-): Promise<PlanoAcaoResponse | null> => {
-  try {
-    const response = await api.get<PlanoAcaoResponse>("/financeiro/custos", {
-      params: { basin_id: basinId },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao buscar custos:", error);
-    return null;
-  }
+): Promise<PlanoAcaoResponse> => {
+  const response = await api.get<PlanoAcaoResponse>("/financeiro/custos", {
+    params: { basin_id: basinId },
+  });
+  return response.data;
 };
 
 export interface KPIItem {
