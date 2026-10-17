@@ -34,6 +34,8 @@ import {
 } from "lucide-react";
 
 interface Measurement {
+  id?: number;
+  measured_at?: string;
   execution_perc?: number;
   iea_relativo?: number;
 }
@@ -74,15 +76,31 @@ export default function MonitoramentoPage() {
     tipologias: [],
   });
 
-  // Filtros
-  const [selectedEixo, setSelectedEixo] = useState("todos");
-  const [selectedTipo, setSelectedTipo] = useState("todos");
-  const [selectedCrono, setSelectedCrono] = useState("todos");
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 7;
-
   const regionId = selectedReservoir?.id;
+
+  // Filtros e página; zerados ao trocar de região (ajuste durante a renderização)
+  const [view, setView] = useState({
+    regionId,
+    eixo: "todos",
+    tipo: "todos",
+    crono: "todos",
+    page: 1,
+  });
+  if (view.regionId !== regionId) {
+    setView({ regionId, eixo: "todos", tipo: "todos", crono: "todos", page: 1 });
+  }
+  const selectedEixo = view.eixo;
+  const selectedTipo = view.tipo;
+  const selectedCrono = view.crono;
+  const setSelectedEixo = (eixo: string) =>
+    setView((v) => ({ ...v, eixo, page: 1 }));
+  const setSelectedTipo = (tipo: string) =>
+    setView((v) => ({ ...v, tipo, page: 1 }));
+  const setSelectedCrono = (crono: string) =>
+    setView((v) => ({ ...v, crono, page: 1 }));
+  const setCurrentPage = (fn: (prev: number) => number) =>
+    setView((v) => ({ ...v, page: fn(v.page) }));
+  const itemsPerPage = 7;
 
   useEffect(() => {
     if (!regionId) return;
@@ -151,10 +169,7 @@ export default function MonitoramentoPage() {
   const actions: ActionItem[] = status === "ready" && actionsData ? actionsData : [];
 
   const clearFilters = () => {
-    setSelectedEixo("todos");
-    setSelectedTipo("todos");
-    setSelectedCrono("todos");
-    setCurrentPage(1);
+    setView((v) => ({ ...v, eixo: "todos", tipo: "todos", crono: "todos", page: 1 }));
   };
 
   const getExecutionStatus = (
@@ -163,20 +178,29 @@ export default function MonitoramentoPage() {
     label: "Sem medição registrada" | "Não iniciada" | "Em andamento" | "Concluída";
     perc: number | null;
   } => {
-    const ms = item.measurements;
-    if (!ms || ms.length === 0)
-      return { label: "Sem medição registrada", perc: null };
-    const frac = Number(ms[ms.length - 1].execution_perc) || 0;
+    const last = getLatestMeasurement(item);
+    if (!last) return { label: "Sem medição registrada", perc: null };
+    const frac = Number(last.execution_perc) || 0;
     const perc = frac * 100;
     if (frac === 0) return { label: "Não iniciada", perc: 0 };
     if (frac >= 1) return { label: "Concluída", perc: 100 };
     return { label: "Em andamento", perc };
   };
 
+  const getLatestMeasurement = (item: ActionItem): Measurement | null => {
+    const ms = item.measurements;
+    if (!ms || ms.length === 0) return null;
+    return ms.reduce((best, m) => {
+      const tb = best.measured_at ? Date.parse(best.measured_at) : 0;
+      const tm = m.measured_at ? Date.parse(m.measured_at) : 0;
+      if (tm !== tb) return tm > tb ? m : best;
+      return (m.id ?? 0) > (best.id ?? 0) ? m : best;
+    });
+  };
+
   const getLatestIEARel = (item: ActionItem) => {
-    if (!item.measurements || item.measurements.length === 0) return null;
-    const lastMeasurement = item.measurements[item.measurements.length - 1];
-    return lastMeasurement.iea_relativo || 0;
+    const last = getLatestMeasurement(item);
+    return last ? last.iea_relativo || 0 : null;
   };
 
   const formatDecimal = (val: number | null) => {
@@ -200,6 +224,7 @@ export default function MonitoramentoPage() {
   };
 
   const totalPages = Math.ceil(actions.length / itemsPerPage);
+  const currentPage = Math.min(Math.max(view.page, 1), totalPages || 1);
   const currentItems = actions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
@@ -266,7 +291,6 @@ export default function MonitoramentoPage() {
                 value={selectedEixo}
                 onValueChange={(v) => {
                   setSelectedEixo(v);
-                  setCurrentPage(1);
                 }}
               >
                 <SelectTrigger className="bg-white w-full border-emerald-100 focus:ring-emerald-200 h-10">
@@ -291,7 +315,6 @@ export default function MonitoramentoPage() {
                 value={selectedCrono}
                 onValueChange={(v) => {
                   setSelectedCrono(v);
-                  setCurrentPage(1);
                 }}
               >
                 <SelectTrigger className="bg-white w-full border-emerald-100 focus:ring-emerald-200 h-10">
@@ -314,7 +337,6 @@ export default function MonitoramentoPage() {
                 value={selectedTipo}
                 onValueChange={(v) => {
                   setSelectedTipo(v);
-                  setCurrentPage(1);
                 }}
               >
                 <SelectTrigger className="bg-white w-full border-emerald-100 focus:ring-emerald-200 h-10">
