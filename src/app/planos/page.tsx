@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { getActions } from "@/services/api";
+import { useAsyncData } from "@/hooks/use-async-data";
+import { DataState } from "@/components/data-state";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +25,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  Loader2,
   X,
   MapPin,
   TrendingUp,
@@ -32,6 +33,24 @@ import {
   ShieldCheck,
   Tag,
 } from "lucide-react";
+
+interface ActionItem {
+  id: number;
+  axis_name?: string;
+  program?: { name?: string };
+  typology?: string;
+  description?: string;
+  source?: string;
+  total_budget?: number;
+  budget_unit?: string;
+  start_year: number;
+  end_year: number;
+}
+interface FiltersData {
+  eixos: string[];
+  programas: string[];
+  tipologias: string[];
+}
 
 const PRAZOS = {
   curto: { inicio: 2024, fim: 2033 },
@@ -51,90 +70,98 @@ const intersects = (
 export default function PlanosAcaoPage() {
   const { selectedReservoir } = useReservoir();
 
-  const [actions, setActions] = useState<any[]>([]);
-  const [filtersData, setFiltersData] = useState<any>({
+  const [filtersData, setFiltersData] = useState<FiltersData>({
     eixos: [],
     programas: [],
     tipologias: [],
   });
-  const [loading, setLoading] = useState(true);
 
-  // Estados dos Filtros
-  const [selectedEixo, setSelectedEixo] = useState("todos");
-  const [selectedTipo, setSelectedTipo] = useState("todos");
-  const [selectedCrono, setSelectedCrono] = useState("todos");
+  const regionId = selectedReservoir?.id;
 
-  const [currentPage, setCurrentPage] = useState(1);
+  // Filtros e página; zerados ao trocar de região (ajuste durante a renderização)
+  const [view, setView] = useState({
+    regionId,
+    eixo: "todos",
+    tipo: "todos",
+    crono: "todos",
+    page: 1,
+  });
+  if (view.regionId !== regionId) {
+    setView({ regionId, eixo: "todos", tipo: "todos", crono: "todos", page: 1 });
+  }
+  const selectedEixo = view.eixo;
+  const selectedTipo = view.tipo;
+  const selectedCrono = view.crono;
+  const setSelectedEixo = (eixo: string) =>
+    setView((v) => ({ ...v, eixo, page: 1 }));
+  const setSelectedTipo = (tipo: string) =>
+    setView((v) => ({ ...v, tipo, page: 1 }));
+  const setSelectedCrono = (crono: string) =>
+    setView((v) => ({ ...v, crono, page: 1 }));
+  const setCurrentPage = (fn: (prev: number) => number) =>
+    setView((v) => ({ ...v, page: fn(v.page) }));
   const itemsPerPage = 7;
 
+  const hasActiveFilters =
+    selectedEixo !== "todos" ||
+    selectedTipo !== "todos" ||
+    selectedCrono !== "todos";
+  const clearFilters = () =>
+    setView((v) => ({ ...v, eixo: "todos", tipo: "todos", crono: "todos", page: 1 }));
+
+  // Opções de filtro: falha não bloqueia a tabela
   useEffect(() => {
-    async function loadInitialData() {
-      if (!selectedReservoir) {
-        setLoading(false);
-        return;
-      }
+    if (!regionId) return;
+    const baseUrl =
+      process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+    let cancelled = false;
+    axios
+      .get(`${baseUrl}/actions/filters?basin_id=${regionId}`)
+      .then((res) => {
+        if (!cancelled) setFiltersData(res.data);
+      })
+      .catch((error) => {
+        console.error("Erro ao carregar filtros:", error);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [regionId]);
 
-      setLoading(true);
-      const baseUrl =
-        process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api/v1";
+  const {
+    data: actionsData,
+    status,
+    retry,
+  } = useAsyncData<ActionItem[]>(
+    regionId
+      ? async () => {
+          const res = await getActions(regionId, {
+            eixo: selectedEixo === "todos" ? "" : selectedEixo,
+            tipologia: selectedTipo === "todos" ? "" : selectedTipo,
+          });
+          const rawList: ActionItem[] = Array.isArray(res)
+            ? res
+            : (res as { data?: ActionItem[] }).data || [];
+          const range =
+            selectedCrono === "Curto Prazo"
+              ? PRAZOS.curto
+              : selectedCrono === "Médio Prazo"
+                ? PRAZOS.medio
+                : selectedCrono === "Longo Prazo"
+                  ? PRAZOS.longo
+                  : null;
+          return rawList.filter((item) => {
+            if (!range) return true;
+            const start = item.start_year || 0;
+            const end = item.end_year || start;
+            return intersects(start, end, range.inicio, range.fim);
+          });
+        }
+      : null,
+    [regionId, selectedEixo, selectedTipo, selectedCrono],
+  );
 
-      try {
-        const filtersRes = await axios.get(
-          `${baseUrl}/actions/filters?basin_id=${selectedReservoir.id}`,
-        );
-        setFiltersData(filtersRes.data);
-
-        const actionsData = await getActions(selectedReservoir.id, {
-          eixo: selectedEixo === "todos" ? "" : selectedEixo,
-          tipologia: selectedTipo === "todos" ? "" : selectedTipo,
-        });
-
-        const rawList = Array.isArray(actionsData)
-          ? actionsData
-          : (actionsData as any).data || [];
-
-        const filteredList = rawList.filter((item: any) => {
-          if (selectedCrono === "todos") return true;
-
-          const start = item.start_year || 0;
-          const end = item.end_year || start;
-
-          if (selectedCrono === "Curto Prazo") {
-            return intersects(
-              start,
-              end,
-              PRAZOS.curto.inicio,
-              PRAZOS.curto.fim,
-            );
-          }
-          if (selectedCrono === "Médio Prazo") {
-            return intersects(
-              start,
-              end,
-              PRAZOS.medio.inicio,
-              PRAZOS.medio.fim,
-            );
-          }
-          if (selectedCrono === "Longo Prazo") {
-            return intersects(
-              start,
-              end,
-              PRAZOS.longo.inicio,
-              PRAZOS.longo.fim,
-            );
-          }
-          return true;
-        });
-
-        setActions(filteredList);
-      } catch (error) {
-        console.error("Erro ao carregar dados:", error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadInitialData();
-  }, [selectedReservoir, selectedEixo, selectedTipo, selectedCrono]);
+  const actions: ActionItem[] = status === "ready" && actionsData ? actionsData : [];
 
   const getTimelineLabel = (start: number, end: number) => {
     if (!start) return "N/A";
@@ -148,7 +175,7 @@ export default function PlanosAcaoPage() {
     return labels.length ? `${labels.join(" / ")} Prazo` : "N/A";
   };
 
-  const formatBudgetWithUnit = (item: any) => {
+  const formatBudgetWithUnit = (item: ActionItem) => {
     const value = Number(item.total_budget || 0);
     const unit = item.budget_unit || "Global";
     const formatted = new Intl.NumberFormat("pt-BR", {
@@ -161,23 +188,11 @@ export default function PlanosAcaoPage() {
   };
 
   const totalPages = Math.ceil(actions.length / itemsPerPage);
+  const currentPage = Math.min(view.page, Math.max(totalPages, 1));
   const currentItems = actions.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
-
-  if (loading) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center bg-white">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-blue-300" />
-          <p className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase italic">
-            Sincronizando Matriz
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (!selectedReservoir) {
     return <SelectRegionPrompt moduleName="Planos de Ação" />;
@@ -227,7 +242,6 @@ export default function PlanosAcaoPage() {
               value={selectedEixo}
               onValueChange={(v) => {
                 setSelectedEixo(v);
-                setCurrentPage(1);
               }}
             >
               <SelectTrigger className="bg-white w-full">
@@ -252,7 +266,6 @@ export default function PlanosAcaoPage() {
               value={selectedTipo}
               onValueChange={(v) => {
                 setSelectedTipo(v);
-                setCurrentPage(1);
               }}
             >
               <SelectTrigger className="bg-white w-full">
@@ -277,7 +290,6 @@ export default function PlanosAcaoPage() {
               value={selectedCrono}
               onValueChange={(v) => {
                 setSelectedCrono(v);
-                setCurrentPage(1);
               }}
             >
               <SelectTrigger className="bg-white w-full">
@@ -294,17 +306,26 @@ export default function PlanosAcaoPage() {
 
           <Button
             variant="outline"
-            onClick={() => {
-              setSelectedEixo("todos");
-              setSelectedTipo("todos");
-              setSelectedCrono("todos");
-            }}
+            onClick={clearFilters}
             className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-[10px] font-bold tracking-widest"
           >
             <X className="w-3 h-3 mr-2" /> Limpar Filtros
           </Button>
         </section>
 
+        {status === "loading" || status === "idle" ? (
+          <div className="mb-16"><DataState status="loading" /></div>
+        ) : status === "error" ? (
+          <div className="mb-16"><DataState status="error" onRetry={retry} /></div>
+        ) : actions.length === 0 ? (
+          <div className="mb-16">
+            <DataState
+              status="empty"
+              onClearFilters={hasActiveFilters ? clearFilters : undefined}
+            />
+          </div>
+        ) : (
+        <>
         {/* Adicionamos w-full, overflow-hidden e um max-w rigoroso para mobile */}
         <div className="rounded-xl border border-slate-200 shadow-2xl shadow-slate-200/40 bg-white flex flex-col w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden">
           {/* Área de scroll com w-full garantido */}
@@ -332,8 +353,7 @@ export default function PlanosAcaoPage() {
               </TableHeader>
 
               <TableBody>
-                {currentItems.length > 0 ? (
-                  currentItems.map((item) => (
+                {currentItems.map((item) => (
                     <TableRow
                       key={item.id}
                       className="border-slate-100 hover:bg-blue-50/30 transition-colors"
@@ -391,17 +411,7 @@ export default function PlanosAcaoPage() {
                         </div>
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={5}
-                      className="h-40 text-center text-slate-400 italic"
-                    >
-                      Nenhum resultado para estes filtros.
-                    </TableCell>
-                  </TableRow>
-                )}
+                  ))}
               </TableBody>
             </Table>
           </div>
@@ -468,6 +478,8 @@ export default function PlanosAcaoPage() {
             </p>
           </div>
         </footer>
+        </>
+        )}
       </div>
     </div>
   );
