@@ -47,7 +47,7 @@ function getImageUrl(imagePath?: string): string {
 }
 
 export default function HomePage() {
-  const { selectedReservoir } = useReservoir();
+  const { selectedReservoir, loadError } = useReservoir();
   const [selectedMapType, setSelectedMapType] = useState<"1.2" | "1.3">("1.2");
   const {
     data: maps,
@@ -133,7 +133,7 @@ export default function HomePage() {
                 <ReservoirSelector fullWidth />
               </div>
 
-              {!selectedReservoir && (
+              {!selectedReservoir && !loadError && (
                 <div className="flex items-center gap-2 p-3 rounded-lg bg-sky-50 border border-sky-200/80 text-xs text-[#005384] font-medium">
                   <Info className="h-4 w-4 text-[#0094e0] shrink-0" />
                   <span>

@@ -7,6 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { useReservoir } from "@/context/ReservoirContext";
 
 interface ReservoirSelectorProps {
@@ -14,8 +15,14 @@ interface ReservoirSelectorProps {
 }
 
 export function ReservoirSelector({ fullWidth = false }: ReservoirSelectorProps) {
-  const { reservoirs, selectedReservoir, setSelectedReservoir, isLoading } =
-    useReservoir();
+  const {
+    reservoirs,
+    selectedReservoir,
+    setSelectedReservoir,
+    isLoading,
+    loadError,
+    retryReservoirs,
+  } = useReservoir();
 
   if (isLoading) {
     return (
@@ -26,6 +33,17 @@ export function ReservoirSelector({ fullWidth = false }: ReservoirSelectorProps)
             : "w-full h-10 bg-muted animate-pulse rounded-md"
         }
       />
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="flex items-center gap-2 text-sm text-destructive">
+        <span>Não foi possível carregar as regiões.</span>
+        <Button variant="outline" size="sm" onClick={retryReservoirs}>
+          Tentar novamente
+        </Button>
+      </div>
     );
   }
 
