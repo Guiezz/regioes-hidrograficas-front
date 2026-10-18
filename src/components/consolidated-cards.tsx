@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Activity, Target, BarChart3, Layers } from "lucide-react";
 
-interface ConsolidatedData {
+export interface ConsolidatedData {
   indice_global: number;
   iea_max: number;
   indice_atual: number;
