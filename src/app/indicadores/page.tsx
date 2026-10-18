@@ -6,6 +6,7 @@ import { useReservoir } from "@/context/ReservoirContext";
 import { getRadarData, getConsolidated } from "@/services/api";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { Badge } from "@/components/ui/badge";
+import type { ConsolidatedData } from "@/components/consolidated-cards";
 import { Loader2, PieChart, Target, Activity } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -28,7 +29,7 @@ export default function IndicadoresPage() {
   const { selectedReservoir } = useReservoir();
 
   const [chartData, setChartData] = useState<RadarItem[]>([]);
-  const [consolidated, setConsolidated] = useState<any>(null);
+  const [consolidated, setConsolidated] = useState<ConsolidatedData | null>(null);
   const [totalActions, setTotalActions] = useState(0);
   const [loading, setLoading] = useState(true);
 
