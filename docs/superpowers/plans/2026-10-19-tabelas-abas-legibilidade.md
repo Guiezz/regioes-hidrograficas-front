@@ -135,9 +135,9 @@
 
 ### Task 6: PR
 
-- [ ] **Step 1:** `git push -u origin feat/tabelas-abas-legibilidade`; `gh pr create --base dev --title "UX: tabelas no celular, abas fixas e legibilidade"` com body: resumo por frente (A/B/C), ids do ClickUp cobertos, decisão de container query, contagens antes/depois da Task 5, o que ficou de fora; última linha `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
-- [ ] **Step 2:** `gh pr checks --watch` → `Typecheck, lint e build` = pass.
-- [ ] **Step 3:** Não mergear. Reportar ao orquestrador com links, commits, contagens e os caminhos dos screenshots.
+- [x] **Step 1:** `git push -u origin feat/tabelas-abas-legibilidade`; `gh pr create --base dev --title "UX: tabelas no celular, abas fixas e legibilidade"` com body: resumo por frente (A/B/C), ids do ClickUp cobertos, decisão de container query, contagens antes/depois da Task 5, o que ficou de fora; última linha `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
+- [x] **Step 2:** `gh pr checks --watch` → `Typecheck, lint e build` = pass.
+- [x] **Step 3:** Não mergear. Reportar ao orquestrador com links, commits, contagens e os caminhos dos screenshots.
 
 ## Desvios
 
