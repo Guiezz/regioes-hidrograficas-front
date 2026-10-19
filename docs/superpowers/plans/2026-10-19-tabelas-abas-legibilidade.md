@@ -110,10 +110,10 @@
 **Files:**
 - Modify: `src/app/situacao-hidrica/page.tsx` (`:217` envoltório, `:241-265` bloco das abas e `TabsList`, troca de aba)
 
-- [ ] **Step 1: Sticky** — envoltório `overflow-x-hidden` → `overflow-x-clip`; bloco das abas sem `overflow-hidden`, `sticky top-0 z-20`, fundo `bg-white/95 backdrop-blur` e sombra leve só quando faz sentido (pode ser sempre). `TabsList` no celular: uma linha com `overflow-x-auto`, gatilhos `whitespace-nowrap shrink-0`; em `md:` volta ao `inline-flex` atual.
-- [ ] **Step 2: Troca de aba** — ao mudar de aba, se o topo do conteúdo estiver acima das abas fixas, rolar o container de rolagem principal até o início do conteúdo descontando a altura das abas (`scrollIntoView` com `scroll-margin-top` no painel é suficiente); a aba ativa usa `scrollIntoView({ inline: "nearest", block: "nearest" })` dentro da lista.
-- [ ] **Step 3: Portal** — `/situacao-hidrica?basin_id=9` em 1440, 768 e 390: rolar até o meio → abas visíveis no topo; trocar de aba lá embaixo → conteúdo novo começa visível logo abaixo das abas (Review Focus 4); no celular, as 4 abas numa linha com rolagem lateral. Screenshots rolados.
-- [ ] **Step 4: Gate + commit** — `npx tsc --noEmit && npm run lint`; `git commit -m "fix(situacao-hidrica): abas fixas ao rolar e em linha unica no celular"` (+ trailer).
+- [x] **Step 1: Sticky** — envoltório `overflow-x-hidden` → `overflow-x-clip`; bloco das abas sem `overflow-hidden`, `sticky top-0 z-20`, fundo `bg-white/95 backdrop-blur` e sombra leve só quando faz sentido (pode ser sempre). `TabsList` no celular: uma linha com `overflow-x-auto`, gatilhos `whitespace-nowrap shrink-0`; em `md:` volta ao `inline-flex` atual.
+- [x] **Step 2: Troca de aba** — ao mudar de aba, se o topo do conteúdo estiver acima das abas fixas, rolar o container de rolagem principal até o início do conteúdo descontando a altura das abas (`scrollIntoView` com `scroll-margin-top` no painel é suficiente); a aba ativa usa `scrollIntoView({ inline: "nearest", block: "nearest" })` dentro da lista.
+- [x] **Step 3: Portal** — `/situacao-hidrica?basin_id=9` em 1440, 768 e 390: rolar até o meio → abas visíveis no topo; trocar de aba lá embaixo → conteúdo novo começa visível logo abaixo das abas (Review Focus 4); no celular, as 4 abas numa linha com rolagem lateral. Screenshots rolados.
+- [x] **Step 4: Gate + commit** — `npx tsc --noEmit && npm run lint`; `git commit -m "fix(situacao-hidrica): abas fixas ao rolar e em linha unica no celular"` (+ trailer).
 
 ---
 
@@ -143,4 +143,4 @@
 
 - **Task 2 — limiar da tabela de Planos: `@5xl` (1024px) → `@[60rem]` (960px).** A página tem `max-w-5xl mx-auto px-6`, então a área útil da tabela nunca passa de 976px (1440 com barra aberta = 976px; 1280 aberta = 896px); com `@5xl` a tabela nunca apareceria. Larguras das colunas ajustadas (decisão do Guilherme): Eixo 20%, Ação 30%, Responsável 18%, Investimento 18%, Prazo 14%; Investimento com `px-3`, `text-sm tabular-nums` (sem `font-mono`), valor `whitespace-nowrap` e unidade em linha própria.
 - **Task 2 — correções achadas na verificação:** a célula Eixo/Programa herdava `whitespace-nowrap` do `TableCell` (rótulos longos como "ASPECTOS POLÍTICOS-INSTITUCIONAIS" estouravam a coluna) → `whitespace-normal` na célula; o selo de Prazo ("Curto / Médio Prazo") passava da coluna de 14% → selo com `whitespace-normal text-center leading-tight` e célula com `px-3`.
-
+- **Task 4 — offset do sticky:** o contêiner de rolagem (`main > div.overflow-y-auto`) tem `p-4 md:p-6` e o `sticky` respeita esse padding (as abas paravam 16–24px abaixo do topo, com o conteúdo aparecendo por cima); por isso o bloco usa `-top-4 md:-top-6` em vez de `top-0`.

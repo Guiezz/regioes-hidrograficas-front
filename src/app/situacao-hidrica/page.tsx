@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { getSections, getKpis } from "@/services/api";
 import type { KPIItem, KPIResponse } from "@/services/api";
@@ -156,6 +156,29 @@ export default function SituacaoHidricaPage() {
   const { selectedReservoir } = useReservoir();
   const regionId = selectedReservoir?.id;
   const [activeTab, setActiveTab] = useState<TabKey>("infraestrutura");
+  const tabsBarRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Ao trocar de aba com a página rolada, o conteúdo novo começa logo abaixo das abas fixas
+  const changeTab = (tab: TabKey) => {
+    setActiveTab(tab);
+    const bar = tabsBarRef.current;
+    const content = contentRef.current;
+    if (
+      bar &&
+      content &&
+      content.getBoundingClientRect().top < bar.getBoundingClientRect().bottom
+    ) {
+      content.scrollIntoView({ block: "start" });
+    }
+  };
+
+  // A aba ativa entra na tela quando a lista rola lateralmente (celular)
+  useEffect(() => {
+    tabsBarRef.current
+      ?.querySelector('[data-state="active"]')
+      ?.scrollIntoView({ inline: "nearest", block: "nearest" });
+  }, [activeTab]);
 
   const { data, status, retry } = useAsyncData<{
     kpis: KPIResponse;
@@ -214,7 +237,7 @@ export default function SituacaoHidricaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900 overflow-x-hidden">
+    <div className="min-h-screen bg-white selection:bg-blue-100 selection:text-blue-900 overflow-x-clip">
       <div className="max-w-5xl mx-auto px-6 py-20 lg:py-32">
         <header className="mb-16 space-y-10">
           <div className="flex items-center gap-4">
@@ -238,19 +261,22 @@ export default function SituacaoHidricaPage() {
           </div>
         </header>
 
-        <div className="sticky top-4 z-20 mb-12 overflow-hidden">
+        <div
+          ref={tabsBarRef}
+          className="sticky -top-4 md:-top-6 z-20 mb-12 bg-white/95 backdrop-blur py-3 shadow-sm"
+        >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <Tabs
               value={activeTab}
-              onValueChange={(v) => setActiveTab(v as TabKey)}
+              onValueChange={(v) => changeTab(v as TabKey)}
             >
-              <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 grid grid-cols-2 md:inline-flex md:flex-row w-full gap-1">
+              <TabsList className="bg-slate-100/80 backdrop-blur-md p-1 rounded-2xl border border-slate-200 shadow-sm !h-auto min-h-12 flex justify-start overflow-x-auto md:overflow-visible md:inline-flex md:flex-row w-full gap-1">
                 {(Object.entries(TAB_CONFIG) as [TabKey, typeof TAB_CONFIG[TabKey]][]).map(
                   ([key, cfg]) => (
                     <TabsTrigger
                       key={key}
                       value={key}
-                      className="rounded-xl px-3 py-2.5 text-[11px] md:text-sm font-bold data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
+                      className="rounded-xl px-3 py-2.5 text-xs md:text-sm font-bold whitespace-nowrap shrink-0 data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm transition-all flex items-center justify-center gap-1.5"
                     >
                       <cfg.icon className="w-3.5 h-3.5" />
                       <span className="hidden md:inline">{cfg.label}</span>
@@ -264,6 +290,7 @@ export default function SituacaoHidricaPage() {
         </div>
 
 
+        <div ref={contentRef} className="scroll-mt-28">
         {status === "loading" || status === "idle" ? (
           <DataState status="loading" />
         ) : status === "error" ? (
@@ -278,7 +305,7 @@ export default function SituacaoHidricaPage() {
           <>
             <Tabs
               value={activeTab}
-              onValueChange={(v) => setActiveTab(v as TabKey)}
+              onValueChange={(v) => changeTab(v as TabKey)}
             >
               {(Object.keys(TAB_CONFIG) as TabKey[]).map((tabKey) => {
                 const atualKpis = kpis[tabKey]?.atual || [];
@@ -408,6 +435,7 @@ export default function SituacaoHidricaPage() {
             </Tabs>
           </>
         )}
+        </div>
 
         <footer className="mt-20 pt-8 border-t border-slate-200 flex flex-col items-center gap-4">
           <div className="w-2 h-2 rounded-full bg-sky-500" />
