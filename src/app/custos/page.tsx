@@ -30,6 +30,7 @@ import {
   Layers,
 } from "lucide-react";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
+import { formatBRL, formatBRLResumido } from "@/lib/format";
 
 /* ─── Keyframes injetados via <style> ─────────────────────────────────────── */
 const globalStyles = `
@@ -50,12 +51,6 @@ const globalStyles = `
   .anim-line-grow { animation: lineGrow 0.55s cubic-bezier(.22,.68,0,1.1) both; transform-origin: left; }
 `;
 
-/* ─── Helpers ──────────────────────────────────────────────────────────────── */
-const fmtBRL = (v: number) =>
-  new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(
-    v,
-  );
-
 /* Barra de progresso proporcional */
 function PercentBar({ value }: { value: number }) {
   return (
@@ -72,6 +67,7 @@ function PercentBar({ value }: { value: number }) {
 function KpiCard({
   label,
   value,
+  exact,
   sub,
   icon,
   accent = "sky",
@@ -79,6 +75,7 @@ function KpiCard({
 }: {
   label: string;
   value: string;
+  exact?: string;
   sub?: string;
   icon: React.ReactNode;
   accent?: "sky" | "blue" | "slate";
@@ -91,7 +88,7 @@ function KpiCard({
   };
   return (
     <div
-      className={`anim-fade-up rounded-2xl border border-slate-100 border-l-4 ${styles[accent]} p-6
+      className={`anim-fade-up h-full rounded-2xl border border-slate-100 border-l-4 ${styles[accent]} p-6
                   shadow-[0_2px_16px_0_rgba(0,0,0,0.04)]
                   hover:shadow-[0_6px_28px_0_rgba(0,0,0,0.09)]
                   transition-shadow duration-300`}
@@ -106,6 +103,9 @@ function KpiCard({
       <p className="text-2xl md:text-3xl font-black text-slate-900 tracking-tight leading-none break-words">
         {value}
       </p>
+      {exact && (
+        <p className="mt-1.5 text-xs text-slate-500 tabular-nums">{exact}</p>
+      )}
       {sub && (
         <p className="mt-2 text-[11px] text-slate-400 italic leading-relaxed">
           {sub}
@@ -141,6 +141,7 @@ export default function CustosPage() {
     ? eixoView.eixo
     : (planoAcao[0]?.eixo ?? "");
   const eixoAtual = planoAcao.find((e) => e.eixo === activeEixo);
+  const maiorAporte = Math.max(0, ...planoAcao.map((e) => e.valorTotalProjetado));
 
   return (
     <>
@@ -203,7 +204,8 @@ export default function CustosPage() {
               <div className="md:col-span-3">
                 <KpiCard
                   label="Investimento Total"
-                  value={fmtBRL(data?.resumoGeral?.valorTotalPrevisto ?? 0)}
+                  value={formatBRLResumido(data?.resumoGeral?.valorTotalPrevisto ?? 0)}
+                  exact={formatBRL(data?.resumoGeral?.valorTotalPrevisto ?? 0)}
                   sub="Previsão consolidada até 2050"
                   icon={<DollarSign className="w-4 h-4" />}
                   accent="sky"
@@ -227,11 +229,8 @@ export default function CustosPage() {
               <div className="md:col-span-3">
                 <KpiCard
                   label="Maior Aporte"
-                  value={fmtBRL(
-                    Math.max(
-                      ...planoAcao.map((e) => e.valorTotalProjetado),
-                    ),
-                  )}
+                  value={formatBRLResumido(maiorAporte)}
+                  exact={formatBRL(maiorAporte)}
                   sub="Representatividade máxima"
                   icon={<TrendingUp className="w-4 h-4" />}
                   accent="slate"
@@ -346,7 +345,10 @@ export default function CustosPage() {
                       Aporte Total
                     </p>
                     <p className="text-2xl md:text-3xl font-black text-white tracking-tight break-words">
-                      {fmtBRL(eixoAtual.valorTotalProjetado)}
+                      {formatBRLResumido(eixoAtual.valorTotalProjetado)}
+                    </p>
+                    <p className="mt-1 text-xs text-slate-300 tabular-nums">
+                      {formatBRL(eixoAtual.valorTotalProjetado)}
                     </p>
                     <Badge className="mt-2 bg-sky-500/20 text-sky-300 border-sky-500/30 font-bold text-[10px] tracking-wider">
                       {eixoAtual.periodos.length} período
@@ -396,7 +398,10 @@ export default function CustosPage() {
                               Custo Fixo
                             </span>
                             <p className="text-xl md:text-2xl font-black text-slate-900 tracking-tight leading-none break-words">
-                              {fmtBRL(periodo.custoFixo)}
+                              {formatBRLResumido(periodo.custoFixo)}
+                            </p>
+                            <p className="mt-1.5 text-xs text-slate-500 tabular-nums">
+                              {formatBRL(periodo.custoFixo)}
                             </p>
                           </div>
                           <div
@@ -420,7 +425,26 @@ export default function CustosPage() {
                                           hover:shadow-[0_6px_24px_0_rgba(0,0,0,0.08)]
                                           transition-shadow duration-300"
                           >
-                            <div className="overflow-x-auto">
+                            <div className="@container">
+                            <ul className="divide-y divide-slate-100 @md:hidden">
+                              {periodo.custosVariaveis.map((cv, idx) => (
+                                <li key={idx} className="px-5 py-4 space-y-1">
+                                  <p className="text-sm text-slate-700 leading-snug">
+                                    {cv.descricao}
+                                  </p>
+                                  <p className="font-mono text-sm font-bold text-slate-800">
+                                    {cv.valorUnitario > 0 ? (
+                                      formatBRL(cv.valorUnitario)
+                                    ) : (
+                                      <span className="text-slate-500 font-normal">
+                                        —
+                                      </span>
+                                    )}
+                                  </p>
+                                </li>
+                              ))}
+                            </ul>
+                            <div className="hidden @md:block overflow-x-auto">
                               <Table className="min-w-[320px]">
                                 <TableHeader>
                                   <TableRow className="border-b border-slate-100 bg-slate-50/70 hover:bg-slate-50/70">
@@ -454,7 +478,7 @@ export default function CustosPage() {
                                                             group-hover/row:text-sky-600 transition-colors"
                                       >
                                         {cv.valorUnitario > 0 ? (
-                                          fmtBRL(cv.valorUnitario)
+                                          formatBRL(cv.valorUnitario)
                                         ) : (
                                           <span className="text-slate-300 font-normal">
                                             —
@@ -465,6 +489,7 @@ export default function CustosPage() {
                                   ))}
                                 </TableBody>
                               </Table>
+                            </div>
                             </div>
                           </div>
                         ) : (
