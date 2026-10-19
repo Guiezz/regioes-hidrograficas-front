@@ -71,13 +71,13 @@
 - Consumes: `formatBRL` de `@/lib/format` (Task 1) no lugar do `Intl.NumberFormat` local.
 - Produces: `formatBudgetParts(item): { valor: string; unidade: string | null }` (local à página; `unidade` null quando "Global").
 
-- [ ] **Step 1: Tabela larga** — remover `min-w-321.5`, o `max-w-[calc(100vw-3rem)]` e o `overflow-hidden` do envoltório que cortam conteúdo; larguras 20/32/18/16/14%; célula Investimento: valor `whitespace-nowrap`, unidade (`/ ano`) em linha própria `text-xs text-slate-500`.
+- [x] **Step 1: Tabela larga** — remover `min-w-321.5`, o `max-w-[calc(100vw-3rem)]` e o `overflow-hidden` do envoltório que cortam conteúdo; larguras 20/32/18/16/14%; célula Investimento: valor `whitespace-nowrap`, unidade (`/ ano`) em linha própria `text-xs text-slate-500`.
 
-- [ ] **Step 2: Cards** — envoltório `@container`; tabela em `hidden @5xl:block`; lista de cards `@5xl:hidden` sobre o mesmo `currentItems` (mesma paginação). Conteúdo do card na ordem da spec (eixo → programa → ação → responsável + tipologia → rodapé com investimento à esquerda e prazo à direita). Estado vazio idêntico ao da tabela.
+- [x] **Step 2: Cards** — envoltório `@container`; tabela em `hidden @5xl:block`; lista de cards `@5xl:hidden` sobre o mesmo `currentItems` (mesma paginação). Conteúdo do card na ordem da spec (eixo → programa → ação → responsável + tipologia → rodapé com investimento à esquerda e prazo à direita). Estado vazio idêntico ao da tabela.
 
-- [ ] **Step 3: Gate** — `npx tsc --noEmit && npm run lint` limpo.
+- [x] **Step 3: Gate** — `npx tsc --noEmit && npm run lint` limpo.
 
-- [ ] **Step 4: Portal** — `/planos?basin_id=3`:
+- [x] **Step 4: Portal** — `/planos?basin_id=3`:
   - 1440 com barra aberta: tabela com as 5 colunas inteiras, Prazo visível, sem rolagem horizontal.
   - 1280 com barra aberta → cards; recolhida → tabela (Review Focus 1).
   - 768 e 390 → cards, nada cortado, `document.documentElement.scrollWidth` = largura da janela.
@@ -85,7 +85,7 @@
   - Procurar um item com unidade (não "Global") e conferir a célula (Review Focus 3); se não houver nenhum na região, dizer isso no relatório.
   Screenshots.
 
-- [ ] **Step 5: Commit** — `git commit -m "fix(planos): tabela sem colunas cortadas e cards quando a area e estreita"` (+ trailer).
+- [x] **Step 5: Commit** — `git commit -m "fix(planos): tabela sem colunas cortadas e cards quando a area e estreita"` (+ trailer).
 
 ---
 
@@ -138,3 +138,9 @@
 - [ ] **Step 1:** `git push -u origin feat/tabelas-abas-legibilidade`; `gh pr create --base dev --title "UX: tabelas no celular, abas fixas e legibilidade"` com body: resumo por frente (A/B/C), ids do ClickUp cobertos, decisão de container query, contagens antes/depois da Task 5, o que ficou de fora; última linha `🤖 Generated with [Claude Code](https://claude.com/claude-code)`.
 - [ ] **Step 2:** `gh pr checks --watch` → `Typecheck, lint e build` = pass.
 - [ ] **Step 3:** Não mergear. Reportar ao orquestrador com links, commits, contagens e os caminhos dos screenshots.
+
+## Desvios
+
+- **Task 2 — limiar da tabela de Planos: `@5xl` (1024px) → `@[60rem]` (960px).** A página tem `max-w-5xl mx-auto px-6`, então a área útil da tabela nunca passa de 976px (1440 com barra aberta = 976px; 1280 aberta = 896px); com `@5xl` a tabela nunca apareceria. Larguras das colunas ajustadas (decisão do Guilherme): Eixo 20%, Ação 30%, Responsável 18%, Investimento 18%, Prazo 14%; Investimento com `px-3`, `text-sm tabular-nums` (sem `font-mono`), valor `whitespace-nowrap` e unidade em linha própria.
+- **Task 2 — correções achadas na verificação:** a célula Eixo/Programa herdava `whitespace-nowrap` do `TableCell` (rótulos longos como "ASPECTOS POLÍTICOS-INSTITUCIONAIS" estouravam a coluna) → `whitespace-normal` na célula; o selo de Prazo ("Curto / Médio Prazo") passava da coluna de 14% → selo com `whitespace-normal text-center leading-tight` e célula com `px-3`.
+
