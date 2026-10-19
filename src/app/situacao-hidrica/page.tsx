@@ -263,7 +263,7 @@ export default function SituacaoHidricaPage() {
 
         <div
           ref={tabsBarRef}
-          className="sticky -top-4 md:-top-6 z-20 mb-12 bg-white/95 backdrop-blur py-3 shadow-sm"
+          className="sticky -top-4 md:-top-6 z-20 mb-12 bg-white py-3 shadow-sm"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <Tabs
