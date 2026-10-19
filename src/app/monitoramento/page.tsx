@@ -255,7 +255,7 @@ export default function MonitoramentoPage() {
               <h1               className="text-4xl md:text-6xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Monitoramento
               </h1>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-slate-500">
                 <Target className="w-4 h-4 text-emerald-500" />
                 <span className="text-sm font-medium italic">
                   {selectedReservoir?.name
@@ -288,7 +288,7 @@ export default function MonitoramentoPage() {
         <section className="mb-8 p-4 md:p-6 rounded-2xl bg-emerald-50/30 border border-emerald-100/50 w-full">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-5 items-end">
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+              <label className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1">
                 <LayoutList className="w-3 h-3 inline mr-1 mb-0.5" />
                 Eixo Estratégico
               </label>
@@ -313,7 +313,7 @@ export default function MonitoramentoPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+              <label className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1">
                 Cronograma
               </label>
               <Select
@@ -335,7 +335,7 @@ export default function MonitoramentoPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+              <label className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1">
                 Tipologia da Ação
               </label>
               <Select
@@ -361,7 +361,7 @@ export default function MonitoramentoPage() {
             <Button
               variant="outline"
               onClick={clearFilters}
-              className="w-full border-dashed border-slate-300 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 h-10 uppercase text-[10px] font-bold tracking-widest"
+              className="w-full border-dashed border-slate-300 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 hover:border-emerald-200 h-10 uppercase text-xs font-bold tracking-widest"
             >
               <X className="w-3 h-3 mr-2" /> Limpar Filtros
             </Button>
@@ -378,22 +378,22 @@ export default function MonitoramentoPage() {
         ) : (
         <div className="rounded-xl border border-slate-200 shadow-xl shadow-slate-200/20 bg-white flex flex-col w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden mb-16">
           <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
-            <Table className="w-full table-fixed min-w-212.5">
+            <Table className="w-full table-fixed min-w-230">
               <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
                 <TableRow className="border-slate-100">
-                  <TableHead className="w-[35%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[30%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Ação Estratégica / Descrição
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[16%] py-4 px-3 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Classificação
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">
+                  <TableHead className="w-[16%] py-4 px-3 text-xs font-black uppercase text-slate-500 tracking-widest text-center">
                     Prazo
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-[10px] font-black uppercase text-emerald-600 tracking-widest text-center">
+                  <TableHead className="w-[10%] py-4 px-2 text-xs font-black uppercase text-emerald-600 tracking-widest text-center">
                     IEA Rel.
                   </TableHead>
-                  <TableHead className="w-[20%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">
+                  <TableHead className="w-[28%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest text-right">
                     Status Execução
                   </TableHead>
                 </TableRow>
@@ -408,8 +408,8 @@ export default function MonitoramentoPage() {
                         key={item.id}
                         className="hover:bg-slate-50/50 transition-colors border-slate-100"
                       >
-                        <TableCell className="px-5 py-5 align-top">
-                          <div className="text-[9px] font-black text-emerald-600 uppercase tracking-wider mb-2 wrap-break-word hyphens-auto">
+                        <TableCell className="px-5 py-5 align-top whitespace-normal">
+                          <div className="text-xs font-black text-emerald-600 uppercase tracking-wider mb-2 wrap-break-word hyphens-auto">
                             {item.axis_name}
                           </div>
                           <p className="text-sm font-medium text-slate-700 leading-relaxed text-justify whitespace-normal wrap-break-word hyphens-auto">
@@ -417,18 +417,18 @@ export default function MonitoramentoPage() {
                           </p>
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top">
+                        <TableCell className="px-3 py-5 align-top">
                           <Badge
                             variant="outline"
-                            className="font-bold text-[9px] border-slate-200 bg-slate-50 text-slate-600 whitespace-normal text-center wrap-break-word hyphens-auto"
+                            className="font-bold text-xs border-slate-200 bg-slate-50 text-slate-600 whitespace-normal text-center wrap-break-word hyphens-auto"
                           >
                             {item.typology}
                           </Badge>
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top text-center">
+                        <TableCell className="px-3 py-5 align-top text-center whitespace-normal">
                           <div className="flex flex-col items-center gap-1">
-                            <span className="text-[10px] font-black uppercase text-slate-400">
+                            <span className="text-xs font-black uppercase text-slate-500">
                               {getTimelineLabel(item.start_year, item.end_year)}
                             </span>
                             <span className="text-xs font-mono text-slate-500 bg-slate-100 px-2 py-0.5 rounded whitespace-nowrap">
@@ -437,22 +437,22 @@ export default function MonitoramentoPage() {
                           </div>
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top text-center">
+                        <TableCell className="px-2 py-5 align-top text-center">
                           {ieaRel !== null ? (
                             <div className="inline-flex items-center justify-center min-w-12 py-1 rounded-md bg-emerald-50 text-emerald-700 font-mono font-bold text-sm border border-emerald-100 shadow-sm">
                               {formatDecimal(ieaRel)}
                             </div>
                           ) : (
-                            <span className="text-slate-300 font-mono text-xs">
+                            <span className="text-slate-500 font-mono text-xs">
                               —
                             </span>
                           )}
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top text-right">
+                        <TableCell className="px-5 py-5 align-top text-right whitespace-normal">
                           {exec.label === "Em andamento" ? (
                             <div className="flex flex-col items-end gap-1">
-                              <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                              <span className="text-xs uppercase font-bold text-slate-500 tracking-wider">
                                 Em andamento
                               </span>
                               <div className="flex items-center gap-2">
@@ -462,19 +462,19 @@ export default function MonitoramentoPage() {
                                     style={{ width: `${Math.round(exec.perc ?? 0)}%` }}
                                   />
                                 </div>
-                                <span className="text-[10px] font-mono font-bold text-slate-500">
+                                <span className="text-xs font-mono font-bold text-slate-500">
                                   {Math.round(exec.perc ?? 0)}%
                                 </span>
                               </div>
                             </div>
                           ) : (
                             <span
-                              className={`text-[10px] uppercase font-bold tracking-wider ${
+                              className={`text-xs uppercase font-bold tracking-wider ${
                                 exec.label === "Concluída"
                                   ? "text-emerald-600"
                                   : exec.label === "Não iniciada"
                                     ? "text-slate-500"
-                                    : "text-slate-400"
+                                    : "text-slate-500"
                               }`}
                             >
                               {exec.label}
@@ -488,7 +488,7 @@ export default function MonitoramentoPage() {
                   <TableRow>
                     <TableCell
                       colSpan={5}
-                      className="h-48 text-center text-slate-400 italic bg-slate-50/30"
+                      className="h-48 text-center text-slate-500 italic bg-slate-50/30"
                     >
                       Nenhuma ação encontrada para os filtros selecionados.
                     </TableCell>
@@ -499,7 +499,7 @@ export default function MonitoramentoPage() {
           </div>
 
           <div className="bg-slate-50/80 border-t border-slate-200 px-6 py-4 flex items-center justify-between backdrop-blur-sm">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.12em]">
               Pág. {currentPage} / {totalPages || 1}
             </span>
             <div className="flex gap-2">

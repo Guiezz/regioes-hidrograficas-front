@@ -109,12 +109,33 @@ export default function MatrizPage() {
   );
 
   const getPriorityBadge = (priority?: string) => {
-    const p = priority?.toLowerCase() || "";
+    const p = (priority ?? "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     if (p.includes("alta"))
-      return <Badge className="bg-red-500 hover:bg-red-600">Alta</Badge>;
-    if (p.includes("méd") || p.includes("med"))
-      return <Badge className="bg-amber-500 hover:bg-amber-600">Média</Badge>;
-    return <Badge className="bg-emerald-500 hover:bg-emerald-600">Baixa</Badge>;
+      return (
+        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          Alta
+        </Badge>
+      );
+    if (p.includes("med"))
+      return (
+        <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+          Média
+        </Badge>
+      );
+    if (p.includes("baix"))
+      return (
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+          Baixa
+        </Badge>
+      );
+    return (
+      <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200">
+        Não informada
+      </Badge>
+    );
   };
 
   const clearFilters = () => {
@@ -145,7 +166,7 @@ export default function MatrizPage() {
         <header className="mb-16 space-y-10">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
+            <span className="text-xs font-bold uppercase tracking-[0.12em] text-sky-600">
               Planejamento Estratégico
             </span>
           </div>
@@ -154,7 +175,7 @@ export default function MatrizPage() {
             <h1 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               Matriz de Ações
             </h1>
-            <div className="flex items-center gap-2 text-slate-400 font-medium">
+            <div className="flex items-center gap-2 text-slate-500 font-medium">
               <MapPin className="w-4 h-4 text-blue-500" />
               <span className="text-sm tracking-wide">
                 {/* 5. Nome dinâmico */}
@@ -177,7 +198,7 @@ export default function MatrizPage() {
           <section className="mb-12 mx-4 md:mx-0 grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6 p-4 md:p-6 rounded-2xl bg-slate-50 border border-slate-100 w-[calc(100%-2rem)] md:w-full items-end">
             {/* Filtro Tipo de Matriz */}
             <div className="space-y-2 w-full overflow-hidden">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                 <Filter className="w-3 h-3" /> Eixo
               </label>
               <Select value={filterTipo} onValueChange={setFilterTipo}>
@@ -198,7 +219,7 @@ export default function MatrizPage() {
 
             {/* Filtro Programa */}
             <div className="space-y-2 w-full overflow-hidden">
-              <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+              <label className="text-xs font-black uppercase tracking-widest text-slate-500 flex items-center gap-2">
                 <ClipboardList className="w-3 h-3" /> Programa
               </label>
               <Select value={filterPrograma} onValueChange={setFilterPrograma}>
@@ -220,7 +241,7 @@ export default function MatrizPage() {
             <Button
               variant="outline"
               onClick={clearFilters}
-              className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-[10px] font-bold tracking-widest mt-2 lg:mt-0"
+              className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-xs font-bold tracking-widest mt-2 lg:mt-0"
             >
               <X className="w-3 h-3 mr-2" /> Limpar Filtros
             </Button>
@@ -235,18 +256,47 @@ export default function MatrizPage() {
           regionName={selectedReservoir.name}
           unavailableReason="A Matriz de Ação desta região ainda está sendo incorporada ao sistema a partir do plano oficial."
         >
-          <div className="rounded-2xl border border-slate-200 shadow-sm bg-white flex flex-col w-full max-w-[calc(100vw-2rem)] md:max-w-full overflow-hidden mb-6">
-            <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
-              <Table className="w-full table-fixed min-w-225">
+          {/* @container: tabela só quando a área tem 672px (@2xl); abaixo, cards */}
+          <div className="@container w-full mb-6">
+          <div className="rounded-2xl border border-slate-200 shadow-sm bg-white flex flex-col w-full">
+            {/* Cards (área estreita) */}
+            <ul className="divide-y divide-slate-100 @2xl:hidden">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item) => (
+                  <li key={item.id} className="p-5 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-[15px] font-semibold text-slate-800 leading-snug wrap-break-word hyphens-auto">
+                        {item.acoes_especificas}
+                      </p>
+                      <div className="shrink-0">{getPriorityBadge(item.prioridade)}</div>
+                    </div>
+                    <p className="text-xs text-blue-600 font-bold uppercase tracking-wider wrap-break-word">
+                      {item.programa}
+                    </p>
+                    <p className="text-sm text-slate-600 leading-relaxed wrap-break-word hyphens-auto">
+                      {item.instituicoes_envolvidas}
+                    </p>
+                  </li>
+                ))
+              ) : (
+                <li className="h-40 flex items-center justify-center text-center text-slate-500 italic">
+                  Nenhuma ação encontrada.
+                </li>
+              )}
+            </ul>
+
+            {/* Tabela (área larga) */}
+            <div className="hidden @2xl:block overflow-y-auto max-h-120 w-full">
+              <Table className="w-full table-fixed">
                 <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
                   <TableRow className="border-slate-200">
-                    <TableHead className="w-[45%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                    <TableHead className="w-[45%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                       Ação Específica
                     </TableHead>
-                    <TableHead className="w-[35%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                    <TableHead className="w-[35%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                       Responsáveis
                     </TableHead>
-                    <TableHead className="w-[20%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">
+                    <TableHead className="w-[20%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest text-center">
                       Prioridade
                     </TableHead>
                   </TableRow>
@@ -263,7 +313,7 @@ export default function MatrizPage() {
                             <p className="text-[15px] font-semibold text-slate-800 leading-snug whitespace-normal wrap-break-word hyphens-auto">
                               {item.acoes_especificas}
                             </p>
-                            <p className="text-[11px] text-blue-500 font-bold uppercase tracking-wider whitespace-normal wrap-break-word">
+                            <p className="text-xs text-blue-600 font-bold uppercase tracking-wider whitespace-normal wrap-break-word">
                               {item.programa}
                             </p>
                           </div>
@@ -282,7 +332,7 @@ export default function MatrizPage() {
                     <TableRow>
                       <TableCell
                         colSpan={3}
-                        className="h-40 text-center text-slate-400 italic"
+                        className="h-40 text-center text-slate-500 italic"
                       >
                         Nenhuma ação encontrada.
                       </TableCell>
@@ -291,6 +341,7 @@ export default function MatrizPage() {
                 </TableBody>
               </Table>
             </div>
+          </div>
           </div>
 
           {/* Controles de Paginação */}

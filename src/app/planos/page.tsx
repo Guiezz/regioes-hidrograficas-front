@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useReservoir } from "@/context/ReservoirContext";
 import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { getActions } from "@/services/api";
+import { formatBRL } from "@/lib/format";
 import { useAsyncData } from "@/hooks/use-async-data";
 import { DataState } from "@/components/data-state";
 import axios from "axios";
@@ -175,16 +176,12 @@ export default function PlanosAcaoPage() {
     return labels.length ? `${labels.join(" / ")} Prazo` : "N/A";
   };
 
-  const formatBudgetWithUnit = (item: ActionItem) => {
-    const value = Number(item.total_budget || 0);
+  const formatBudgetParts = (item: ActionItem) => {
     const unit = item.budget_unit || "Global";
-    const formatted = new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-    return unit === "Global"
-      ? formatted
-      : `${formatted} / ${unit.toLowerCase()}`;
+    return {
+      valor: formatBRL(Number(item.total_budget || 0)),
+      unidade: unit === "Global" ? null : `/ ${unit.toLowerCase()}`,
+    };
   };
 
   const totalPages = Math.ceil(actions.length / itemsPerPage);
@@ -214,7 +211,7 @@ export default function PlanosAcaoPage() {
               <h1               className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Plano de Ações
               </h1>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-slate-500">
                 <MapPin className="w-4 h-4 text-blue-500" />
                 <span className="text-sm font-medium italic">
                   {selectedReservoir?.name
@@ -235,7 +232,7 @@ export default function PlanosAcaoPage() {
         {/* Filtros */}
         <section className="mb-8 py-6 px-6 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col md:flex-row md:flex-wrap items-start md:items-end w-full gap-6">
           <div className="space-y-1.5 w-full md:w-56">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+            <label className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1">
               Eixo
             </label>
             <Select
@@ -259,7 +256,7 @@ export default function PlanosAcaoPage() {
           </div>
 
           <div className="space-y-1.5 w-full md:w-48">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+            <label className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1">
               Tipologia
             </label>
             <Select
@@ -283,7 +280,7 @@ export default function PlanosAcaoPage() {
           </div>
 
           <div className="space-y-1.5 w-full md:flex-1 md:min-w-50">
-            <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">
+            <label className="text-xs font-black uppercase text-slate-500 tracking-widest ml-1">
               Cronograma (Prazo)
             </label>
             <Select
@@ -307,7 +304,7 @@ export default function PlanosAcaoPage() {
           <Button
             variant="outline"
             onClick={clearFilters}
-            className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-[10px] font-bold tracking-widest"
+            className="w-full border-dashed border-slate-300 text-slate-500 hover:text-blue-600 hover:bg-blue-50 hover:border-blue-200 h-10 uppercase text-xs font-bold tracking-widest"
           >
             <X className="w-3 h-3 mr-2" /> Limpar Filtros
           </Button>
@@ -326,27 +323,83 @@ export default function PlanosAcaoPage() {
           </div>
         ) : (
         <>
-        {/* Adicionamos w-full, overflow-hidden e um max-w rigoroso para mobile */}
-        <div className="rounded-xl border border-slate-200 shadow-2xl shadow-slate-200/40 bg-white flex flex-col w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden">
-          {/* Área de scroll com w-full garantido */}
-          <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
-            <Table className="w-full table-fixed min-w-321.5">
+        {/* @container: tabela só quando a área de conteúdo tem 960px (@[60rem]); abaixo, cards */}
+        <div className="@container w-full">
+        <div className="rounded-xl border border-slate-200 shadow-2xl shadow-slate-200/40 bg-white flex flex-col w-full">
+          {/* Cards (área estreita) */}
+          <ul className="divide-y divide-slate-100 @[60rem]:hidden">
+            {currentItems.map((item) => {
+              const { valor, unidade } = formatBudgetParts(item);
+              return (
+                <li key={item.id} className="p-5 space-y-3">
+                  <div className="space-y-1">
+                    <p className="text-xs font-black text-blue-600 uppercase tracking-wider wrap-break-word">
+                      {item.axis_name || "Eixo não definido"}
+                    </p>
+                    <p className="font-bold text-slate-800 text-sm leading-snug wrap-break-word">
+                      {item.program?.name || "Programa não definido"}
+                    </p>
+                  </div>
+                  <p className="text-slate-600 text-sm leading-relaxed text-justify hyphens-auto">
+                    {item.description}
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-start gap-2 text-xs font-medium text-slate-600 leading-snug">
+                      <ShieldCheck className="w-4 h-4 text-blue-600 shrink-0" />
+                      <span className="wrap-break-word">
+                        {item.source || "Órgão a definir"}
+                      </span>
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter border border-slate-200 px-1.5 py-0.5 rounded max-w-full">
+                      <Tag className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{item.typology}</span>
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-end justify-between gap-3 pt-3 border-t border-slate-100">
+                    <div className="font-mono font-bold text-slate-900 text-sm">
+                      <span className="whitespace-nowrap">{valor}</span>
+                      {unidade && (
+                        <span className="block text-xs font-normal text-slate-500">
+                          {unidade}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-right space-y-1">
+                      <Badge
+                        variant="secondary"
+                        className="rounded-full bg-slate-100 text-slate-600 text-xs font-black uppercase border-none px-3"
+                      >
+                        {getTimelineLabel(item.start_year, item.end_year)}
+                      </Badge>
+                      <p className="text-xs text-slate-500 font-mono whitespace-nowrap">
+                        {item.start_year} — {item.end_year}
+                      </p>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+
+          {/* Tabela (área larga) */}
+          <div className="hidden @[60rem]:block overflow-y-auto max-h-120 w-full">
+            <Table className="w-full table-fixed">
               {/* Header sticky dentro da área de scroll */}
               <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
                 <TableRow className="border-slate-200">
-                  <TableHead className="w-[20%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[20%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Eixo / Programa
                   </TableHead>
-                  <TableHead className="w-[30%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[30%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Ação Estratégica
                   </TableHead>
-                  <TableHead className="w-[20%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[18%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Responsável
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-8 text-[10px] font-black uppercase text-slate-500 tracking-widest text-right">
+                  <TableHead className="w-[18%] py-4 px-3 text-xs font-black uppercase text-slate-500 tracking-widest text-right">
                     Investimento
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest text-center">
+                  <TableHead className="w-[14%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest text-center">
                     Prazo
                   </TableHead>
                 </TableRow>
@@ -361,14 +414,14 @@ export default function PlanosAcaoPage() {
                       {/* Eixo / Programa
                           break-words: quebra palavras longas dentro da célula
                           hyphens-auto: adiciona hífen automático quando necessário */}
-                      <TableCell className="px-5 py-5 align-top">
-                        <div className="text-[9px] font-black text-blue-600 uppercase tracking-wider mb-1 wrap-break-word hyphens-auto">
+                      <TableCell className="px-5 py-5 align-top whitespace-normal">
+                        <div className="text-xs font-black text-blue-600 uppercase tracking-wider mb-1 wrap-break-word hyphens-auto">
                           {item.axis_name || "Eixo não definido"}
                         </div>
-                        <div className="font-bold text-slate-800 text-[11px] leading-tight wrap-break-word hyphens-auto mb-2">
+                        <div className="font-bold text-slate-800 text-xs leading-tight wrap-break-word hyphens-auto mb-2">
                           {item.program?.name || "Programa não definido"}
                         </div>
-                        <div className="inline-flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-tighter border border-slate-200 px-1.5 py-0.5 rounded max-w-full">
+                        <div className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-tighter border border-slate-200 px-1.5 py-0.5 rounded max-w-full">
                           {/* shrink-0 no ícone impede que ele seja comprimido */}
                           <Tag className="w-2.5 h-2.5 shrink-0" />
                           {/* truncate corta a tipologia com "..." se for longa demais */}
@@ -394,19 +447,26 @@ export default function PlanosAcaoPage() {
                       </TableCell>
 
                       {/* Investimento — whitespace-nowrap: valor monetário nunca quebra */}
-                      <TableCell className="px-8 py-5 text-right align-top font-mono font-bold text-slate-900 text-sm whitespace-nowrap">
-                        {formatBudgetWithUnit(item)}
+                      <TableCell className="px-3 py-5 text-right align-top font-bold text-slate-900 text-sm tabular-nums">
+                        <span className="whitespace-nowrap">
+                          {formatBudgetParts(item).valor}
+                        </span>
+                        {formatBudgetParts(item).unidade && (
+                          <span className="block text-xs font-normal text-slate-500">
+                            {formatBudgetParts(item).unidade}
+                          </span>
+                        )}
                       </TableCell>
 
                       {/* Prazo — anos nunca quebram */}
-                      <TableCell className="px-5 py-5 align-top text-center">
+                      <TableCell className="px-3 py-5 align-top text-center">
                         <Badge
                           variant="secondary"
-                          className="rounded-full bg-slate-100 text-slate-500 text-[9px] font-black uppercase border-none px-3 mb-1"
+                          className="rounded-2xl bg-slate-100 text-slate-500 text-xs font-black uppercase border-none px-3 mb-1 whitespace-normal text-center leading-tight"
                         >
                           {getTimelineLabel(item.start_year, item.end_year)}
                         </Badge>
-                        <div className="text-[10px] text-slate-400 font-mono tracking-tighter whitespace-nowrap">
+                        <div className="text-xs text-slate-500 font-mono tracking-tighter whitespace-nowrap">
                           {item.start_year} — {item.end_year}
                         </div>
                       </TableCell>
@@ -418,7 +478,7 @@ export default function PlanosAcaoPage() {
 
           {/* Paginação — fora da área de scroll, sempre visível */}
           <div className="bg-slate-50/50 border-t border-slate-200 px-6 py-4 flex items-center justify-between">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-[0.12em]">
               Pág. {currentPage} / {totalPages || 1}
             </span>
             <div className="flex gap-1">
@@ -445,29 +505,27 @@ export default function PlanosAcaoPage() {
             </div>
           </div>
         </div>
+        </div>
 
         <footer className="mt-12 flex flex-col md:flex-row justify-between items-center bg-slate-900 rounded-2xl p-6 md:p-10 w-full text-white gap-6 md:gap-0 text-center md:text-left">
           <div className="space-y-1 w-full md:w-auto">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
               Aporte Total Estimado
             </p>
             <p className="text-2xl sm:text-3xl md:text-4xl font-mono font-bold text-blue-400 break-all md:break-normal">
-              {new Intl.NumberFormat("pt-BR", {
-                style: "currency",
-                currency: "BRL",
-              }).format(
+              {formatBRL(
                 actions
                   .filter((a) => a.budget_unit === "Global")
                   .reduce((acc, curr) => acc + (curr.total_budget || 0), 0),
               )}
             </p>
-            <p className="text-[9px] text-slate-500 italic">
+            <p className="text-xs text-slate-400 italic">
               * Somente custos globais totalizados
             </p>
           </div>
           <div className="h-px w-full md:w-px md:h-12 bg-slate-800 my-2 md:my-0" />
           <div className="w-full md:w-auto md:text-right">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
+            <p className="text-xs font-black text-slate-400 uppercase tracking-widest">
               Volume de Iniciativas
             </p>
             <p className="text-3xl font-bold">

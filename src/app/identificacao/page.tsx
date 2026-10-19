@@ -73,7 +73,7 @@ export default function IdentificacaoPage() {
         <header className="mb-16 space-y-8">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
+            <span className="text-xs font-bold uppercase tracking-[0.12em] text-sky-600">
               Relatório Técnico
             </span>
           </div>
@@ -82,7 +82,7 @@ export default function IdentificacaoPage() {
             <h1                 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               {mainTitle ? mainTitle.title : "Identificação da Região"}
             </h1>
-            <div className="flex items-center gap-2 text-slate-400">
+            <div className="flex items-center gap-2 text-slate-500">
               <MapPin className="w-4 h-4 text-blue-500" />
               <span className="text-sm font-medium italic">
                 {selectedReservoir?.name

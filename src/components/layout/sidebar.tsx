@@ -166,7 +166,7 @@ export function Sidebar({
         {navigationGroups.map((group, gIdx) => (
           <div key={group.title || `group-${gIdx}`} className="space-y-1">
             {group.title && (!collapsed || isMobile) && (
-              <div className="text-[10px] uppercase tracking-wider text-[#7692ac] px-3 pt-3 pb-1 font-semibold">
+              <div className="text-xs uppercase tracking-wider text-[#7692ac] px-3 pt-3 pb-1 font-semibold">
                 {group.title}
               </div>
             )}
