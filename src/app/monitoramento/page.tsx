@@ -378,22 +378,22 @@ export default function MonitoramentoPage() {
         ) : (
         <div className="rounded-xl border border-slate-200 shadow-xl shadow-slate-200/20 bg-white flex flex-col w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden mb-16">
           <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
-            <Table className="w-full table-fixed min-w-270">
+            <Table className="w-full table-fixed min-w-230">
               <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
                 <TableRow className="border-slate-100">
-                  <TableHead className="w-[35%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[30%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Ação Estratégica / Descrição
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest">
+                  <TableHead className="w-[16%] py-4 px-3 text-xs font-black uppercase text-slate-500 tracking-widest">
                     Classificação
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest text-center">
+                  <TableHead className="w-[16%] py-4 px-3 text-xs font-black uppercase text-slate-500 tracking-widest text-center">
                     Prazo
                   </TableHead>
-                  <TableHead className="w-[15%] py-4 px-5 text-xs font-black uppercase text-emerald-600 tracking-widest text-center">
+                  <TableHead className="w-[10%] py-4 px-2 text-xs font-black uppercase text-emerald-600 tracking-widest text-center">
                     IEA Rel.
                   </TableHead>
-                  <TableHead className="w-[20%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest text-right">
+                  <TableHead className="w-[28%] py-4 px-5 text-xs font-black uppercase text-slate-500 tracking-widest text-right">
                     Status Execução
                   </TableHead>
                 </TableRow>
@@ -417,7 +417,7 @@ export default function MonitoramentoPage() {
                           </p>
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top">
+                        <TableCell className="px-3 py-5 align-top">
                           <Badge
                             variant="outline"
                             className="font-bold text-xs border-slate-200 bg-slate-50 text-slate-600 whitespace-normal text-center wrap-break-word hyphens-auto"
@@ -426,7 +426,7 @@ export default function MonitoramentoPage() {
                           </Badge>
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top text-center whitespace-normal">
+                        <TableCell className="px-3 py-5 align-top text-center whitespace-normal">
                           <div className="flex flex-col items-center gap-1">
                             <span className="text-xs font-black uppercase text-slate-500">
                               {getTimelineLabel(item.start_year, item.end_year)}
@@ -437,7 +437,7 @@ export default function MonitoramentoPage() {
                           </div>
                         </TableCell>
 
-                        <TableCell className="px-5 py-5 align-top text-center">
+                        <TableCell className="px-2 py-5 align-top text-center">
                           {ieaRel !== null ? (
                             <div className="inline-flex items-center justify-center min-w-12 py-1 rounded-md bg-emerald-50 text-emerald-700 font-mono font-bold text-sm border border-emerald-100 shadow-sm">
                               {formatDecimal(ieaRel)}
