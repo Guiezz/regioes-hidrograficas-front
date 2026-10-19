@@ -1,12 +1,27 @@
 "use client";
 
 import { MapPin, Info, Compass } from "lucide-react";
+import { useReservoir } from "@/context/ReservoirContext";
+import { DataState } from "@/components/data-state";
 
 interface SelectRegionPromptProps {
   moduleName: string;
 }
 
 export function SelectRegionPrompt({ moduleName }: SelectRegionPromptProps) {
+  const { isLoading, loadError, retryReservoirs } = useReservoir();
+
+  if (isLoading) return <DataState status="loading" />;
+  if (loadError) {
+    return (
+      <DataState
+        status="error"
+        errorMessage="Não foi possível carregar a lista de regiões."
+        onRetry={retryReservoirs}
+      />
+    );
+  }
+
   return (
     <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
       <div className="max-w-xl mx-auto space-y-6 flex flex-col items-center">

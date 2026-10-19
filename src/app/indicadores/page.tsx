@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 // 1. Troca de useSearchParams para useReservoir
 import { useReservoir } from "@/context/ReservoirContext";
 import { getRadarData, getConsolidated } from "@/services/api";
+import { SelectRegionPrompt } from "@/components/layout/SelectRegionPrompt";
 import { Badge } from "@/components/ui/badge";
+import type { ConsolidatedData } from "@/components/consolidated-cards";
 import { Loader2, PieChart, Target, Activity } from "lucide-react";
 import {
   ResponsiveContainer,
@@ -27,7 +29,7 @@ export default function IndicadoresPage() {
   const { selectedReservoir } = useReservoir();
 
   const [chartData, setChartData] = useState<RadarItem[]>([]);
-  const [consolidated, setConsolidated] = useState<any>(null);
+  const [consolidated, setConsolidated] = useState<ConsolidatedData | null>(null);
   const [totalActions, setTotalActions] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -77,12 +79,16 @@ export default function IndicadoresPage() {
     ? (consolidated.indice_global * 100).toFixed(1)
     : "0.0";
 
+  if (!selectedReservoir) {
+    return <SelectRegionPrompt moduleName="Indicadores" />;
+  }
+
   if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-violet-500" />
-          <span className="text-[10px] font-bold tracking-[0.3em] text-slate-400 uppercase italic">
+          <span className="text-xs font-bold tracking-[0.12em] text-slate-500 uppercase italic">
             Calculando Indicadores
           </span>
         </div>
@@ -108,7 +114,7 @@ export default function IndicadoresPage() {
               <h1               className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
                 Indicadores de Execução
               </h1>
-              <div className="flex items-center gap-2 text-slate-400">
+              <div className="flex items-center gap-2 text-slate-500">
                 <Target className="w-4 h-4 text-violet-500" />
                 <span className="text-sm font-medium italic">
                   {selectedReservoir?.name
@@ -146,7 +152,7 @@ export default function IndicadoresPage() {
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t border-violet-200">
                 <div>
-                  <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-1">
+                  <p className="text-xs font-bold text-violet-600 uppercase tracking-widest mb-1">
                     Total de Iniciativas
                   </p>
                   <p className="text-2xl font-mono font-bold text-violet-600">
@@ -154,7 +160,7 @@ export default function IndicadoresPage() {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-violet-400 uppercase tracking-widest mb-1">
+                  <p className="text-xs font-bold text-violet-600 uppercase tracking-widest mb-1">
                     Índice Global
                   </p>
                   <p className="text-2xl font-mono font-bold text-emerald-600">
@@ -177,10 +183,10 @@ export default function IndicadoresPage() {
           {/* Correção do min-h-600px para min-h-[450px] md:min-h-[600px] e adição da trava w-full */}
           <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/50 p-4 md:p-8 flex flex-col min-h-112.5 md:min-h-150 w-full max-w-[calc(100vw-3rem)] md:max-w-full overflow-hidden">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
-              <h4 className="text-sm font-black text-slate-400 uppercase tracking-widest text-center sm:text-left">
+              <h4 className="text-sm font-black text-slate-500 uppercase tracking-widest text-center sm:text-left">
                 Distribuição por Volume
               </h4>
-              <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-1 rounded font-mono w-fit mx-auto sm:mx-0">
+              <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded font-mono w-fit mx-auto sm:mx-0">
                 Pontuação Acumulada
               </span>
             </div>
@@ -239,7 +245,7 @@ export default function IndicadoresPage() {
                   </RadarChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="flex h-full items-center justify-center text-slate-400">
+                <div className="flex h-full items-center justify-center text-slate-500">
                   <div className="text-center space-y-2">
                     <Activity className="w-12 h-12 mx-auto opacity-50" />
                     <p className="text-sm">
