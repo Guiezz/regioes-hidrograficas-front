@@ -44,7 +44,7 @@ export function ReservoirSelector({
         className={`flex gap-2 text-destructive ${
           fullWidth
             ? "items-center text-sm"
-            : "flex-col items-start gap-0.5 text-[11px] leading-tight"
+            : "flex-col items-start gap-0.5 text-xs leading-tight"
         }`}
       >
         <span className="whitespace-nowrap">
@@ -53,7 +53,7 @@ export function ReservoirSelector({
         <Button
           variant="outline"
           size="sm"
-          className={`shrink-0 whitespace-nowrap ${fullWidth ? "" : "h-6 px-2 text-[11px]"}`}
+          className={`shrink-0 whitespace-nowrap ${fullWidth ? "" : "h-6 px-2 text-xs"}`}
           onClick={retryReservoirs}
         >
           Tentar novamente

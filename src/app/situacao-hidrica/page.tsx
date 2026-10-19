@@ -92,7 +92,7 @@ const SEVERITY_STYLES = {
     bg: "bg-amber-50/60",
     border: "border-amber-100",
     text: "text-amber-800",
-    value: "text-amber-600",
+    value: "text-amber-700",
     icon: "text-amber-500",
   },
   critical: {
@@ -125,7 +125,7 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
   return (
     <div className={`rounded-2xl p-5 border overflow-hidden ${styles.bg} ${styles.border} transition-all hover:shadow-md hover:shadow-${styles.border}`}>
       {isFuture && (
-        <div className="mb-3 flex items-center gap-1.5 px-2 py-1 w-fit rounded-full bg-slate-200/60 text-[9px] font-bold uppercase tracking-wider text-slate-500">
+        <div className="mb-3 flex items-center gap-1.5 px-2 py-1 w-fit rounded-full bg-slate-200/60 text-xs font-bold uppercase tracking-wider text-slate-500">
           <Clock className="w-2.5 h-2.5" />
           Projetado
         </div>
@@ -134,7 +134,7 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
         <div className={`p-2 rounded-xl bg-white/80 ${styles.icon}`}>
           <Icon className="w-5 h-5" />
         </div>
-        <span className={`text-[10px] font-bold uppercase tracking-widest ${styles.text}`}>
+        <span className={`text-xs font-bold uppercase tracking-widest ${styles.text}`}>
           {kpi.label}
         </span>
       </div>
@@ -143,7 +143,7 @@ function KpiCard({ kpi }: { kpi: KPIItem }) {
         {kpi.unit && <span className="text-base font-medium opacity-80">{kpi.unit}</span>}
       </div>
       {isAbbreviated && (
-        <p className="text-[10px] text-slate-400 mt-0.5 font-mono">{kpi.value} {kpi.unit}</p>
+        <p className="text-xs text-slate-500 mt-0.5 font-mono">{kpi.value} {kpi.unit}</p>
       )}
       {kpi.sublabel && (
         <p className="text-xs text-slate-500 mt-2 leading-relaxed">{kpi.sublabel}</p>
@@ -242,7 +242,7 @@ export default function SituacaoHidricaPage() {
         <header className="mb-16 space-y-10">
           <div className="flex items-center gap-4">
             <div className="h-px w-12 bg-sky-500" />
-            <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
+            <span className="text-xs font-bold uppercase tracking-[0.12em] text-sky-600">
               Diagnóstico da Região Hidrográfica
             </span>
           </div>
@@ -250,7 +250,7 @@ export default function SituacaoHidricaPage() {
             <h1 className="text-5xl md:text-7xl font-bold text-slate-900 tracking-tight leading-[0.95]">
               Situação Hídrica
             </h1>
-            <div className="flex items-center gap-2 text-slate-400 font-medium">
+            <div className="flex items-center gap-2 text-slate-500 font-medium">
               <MapPin className="w-4 h-4 text-blue-500" />
               <span className="text-sm tracking-wide">
                 {selectedReservoir?.name
@@ -322,7 +322,7 @@ export default function SituacaoHidricaPage() {
                         {hasBoth && (
                           <div className="flex items-center gap-3">
                             <div className="h-px flex-1 bg-slate-100" />
-                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                            <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
                               Situação Atual
                             </span>
                             <div className="h-px flex-1 bg-slate-100" />
@@ -341,7 +341,7 @@ export default function SituacaoHidricaPage() {
                         {hasBoth && (
                           <div className="flex items-center gap-3">
                             <div className="h-px flex-1 bg-slate-100" />
-                            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-slate-400">
+                            <span className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
                               Expansão Prevista
                             </span>
                             <div className="h-px flex-1 bg-slate-100" />

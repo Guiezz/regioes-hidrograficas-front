@@ -223,7 +223,7 @@ export default function HomePage() {
                     )}
                   </div>
                 ) : (
-                  <span className="text-[11px] font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60 whitespace-nowrap">
+                  <span className="text-xs font-semibold text-[#005384] bg-sky-100/70 px-2.5 py-0.5 rounded-full border border-sky-200/60 whitespace-nowrap">
                     11 Regiões
                   </span>
                 )}
@@ -232,7 +232,7 @@ export default function HomePage() {
               {/* Área da Imagem / Mapa */}
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-50 flex items-center justify-center p-2">
                 {isLoadingMap ? (
-                  <div className="flex flex-col items-center gap-2 text-slate-400">
+                  <div className="flex flex-col items-center gap-2 text-slate-500">
                     <Loader2 className="h-6 w-6 animate-spin text-[#005384]" />
                     <span className="text-xs font-medium">Carregando mapa técnico...</span>
                   </div>
@@ -290,7 +290,7 @@ export default function HomePage() {
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
                 ) : (
-                  <span className="shrink-0 text-[11px] font-medium text-slate-400">
+                  <span className="shrink-0 text-xs font-medium text-slate-500">
                     Aguardando seleção
                   </span>
                 )}

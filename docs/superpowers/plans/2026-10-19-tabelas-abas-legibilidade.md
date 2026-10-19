@@ -122,14 +122,14 @@
 **Files:**
 - Modify: todos os `.tsx` em `src/` com `text-[8|9|10|11px]`, `text-slate-300/400`, `text-gray-300/400`, `placeholder:text-*-400`, textos coloridos claros (`text-blue-400/500`, `text-sky-400/500`, `text-emerald-400/500`, `text-amber-400/500/600`, `text-red-400/500`) e `tracking-[0.2em+]`.
 
-- [ ] **Step 1: Inventário** — `grep -rnE "text-\[(8|9|10|11)px\]|text-(slate|gray)-(300|400)|text-(blue|sky|emerald|red)-(400|500)|text-amber-(400|500|600)|tracking-\[0\.(1[5-9]|[2-9])" src > /tmp/legibilidade-antes.txt; wc -l /tmp/legibilidade-antes.txt`. Guardar a contagem para o relatório.
-- [ ] **Step 2: Aplicar as regras da spec**, arquivo por arquivo, decidindo pelo fundo de cada elemento (claro vs. escuro). Ícones (`<Svg className=…>` / componentes lucide) e traços decorativos `aria-hidden` podem ficar.
-- [ ] **Step 3: Gates**
+- [x] **Step 1: Inventário** — `grep -rnE "text-\[(8|9|10|11)px\]|text-(slate|gray)-(300|400)|text-(blue|sky|emerald|red)-(400|500)|text-amber-(400|500|600)|tracking-\[0\.(1[5-9]|[2-9])" src > /tmp/legibilidade-antes.txt; wc -l /tmp/legibilidade-antes.txt`. Guardar a contagem para o relatório.
+- [x] **Step 2: Aplicar as regras da spec**, arquivo por arquivo, decidindo pelo fundo de cada elemento (claro vs. escuro). Ícones (`<Svg className=…>` / componentes lucide) e traços decorativos `aria-hidden` podem ficar.
+- [x] **Step 3: Gates**
   Run: `grep -rnE "text-\[(8|9|10|11)px\]" src | wc -l` → `0`.
   Run: `grep -rnE "text-(slate|gray)-(300|400)" src` → cada linha restante listada no relatório com o motivo (fundo escuro / ícone).
   Run: `npx tsc --noEmit && npm run lint && npm run build` → limpo.
-- [ ] **Step 4: Portal** — percorrer Início, Identificação, Metodologia, Situação Hídrica, Matriz, Planos, Monitoramento e Custos em 1440 e 390 (`basin_id=9`): nenhum texto que antes era legível ficou ilegível; banner escuro de Custos e barra lateral legíveis (Review Focus 5); rótulos em caixa alta não estouraram cards. Screenshots das 8 páginas em 1440 e de 4 em 390.
-- [ ] **Step 5: Commit** — `git commit -m "style: textos com no minimo 12px e contraste AA em todo o sistema"` (+ trailer).
+- [x] **Step 4: Portal** — percorrer Início, Identificação, Metodologia, Situação Hídrica, Matriz, Planos, Monitoramento e Custos em 1440 e 390 (`basin_id=9`): nenhum texto que antes era legível ficou ilegível; banner escuro de Custos e barra lateral legíveis (Review Focus 5); rótulos em caixa alta não estouraram cards. Screenshots das 8 páginas em 1440 e de 4 em 390.
+- [x] **Step 5: Commit** — `git commit -m "style: textos com no minimo 12px e contraste AA em todo o sistema"` (+ trailer).
 
 ---
 
@@ -145,3 +145,5 @@
 - **Task 2 — correções achadas na verificação:** a célula Eixo/Programa herdava `whitespace-nowrap` do `TableCell` (rótulos longos como "ASPECTOS POLÍTICOS-INSTITUCIONAIS" estouravam a coluna) → `whitespace-normal` na célula; o selo de Prazo ("Curto / Médio Prazo") passava da coluna de 14% → selo com `whitespace-normal text-center leading-tight` e célula com `px-3`.
 - **Task 4 — offset do sticky:** o contêiner de rolagem (`main > div.overflow-y-auto`) tem `p-4 md:p-6` e o `sticky` respeita esse padding (as abas paravam 16–24px abaixo do topo, com o conteúdo aparecendo por cima); por isso o bloco usa `-top-4 md:-top-6` em vez de `top-0`.
 - **Task 4 — fundo da barra fixa:** primeira versão usava `bg-white/95 backdrop-blur` (translúcido; conteúdo aparecia por baixo). Corrigido em commit próprio para `bg-white` opaco em toda a área sticky, conforme a spec ("fundo sólido").
+- **Task 5 — estouros achados na verificação (causados pelo texto maior):** células do Monitoramento (Prazo e Status Execução) herdavam `whitespace-nowrap` do `TableCell` e cortavam "CURTO / MÉDIO PRAZO" e "SEM MEDIÇÃO REGISTRADA" → `whitespace-normal`; `min-w-212.5` → `min-w-270` na tabela do Monitoramento (cabeçalho "CLASSIFICAÇÃO" estourava a coluna na rolagem lateral); abas de eixo de Custos `px-6` → `px-4` (passavam 62px da área em 1440); rodapé do card de Planos ganhou `flex-wrap` (valor com unidade + selo estouravam 7px em 390).
+

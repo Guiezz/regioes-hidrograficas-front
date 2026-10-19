@@ -107,7 +107,7 @@ export default function MetodologiaPage() {
             <div className="space-y-8">
               <div className="flex items-center gap-4">
                 <div className="h-px w-12 bg-sky-500" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">
+                <span className="text-xs font-bold uppercase tracking-[0.12em] text-sky-600">
                   Processo de Trabalho
                 </span>
               </div>
