@@ -408,7 +408,7 @@ export default function MonitoramentoPage() {
                         key={item.id}
                         className="hover:bg-slate-50/50 transition-colors border-slate-100"
                       >
-                        <TableCell className="px-5 py-5 align-top">
+                        <TableCell className="px-5 py-5 align-top whitespace-normal">
                           <div className="text-xs font-black text-emerald-600 uppercase tracking-wider mb-2 wrap-break-word hyphens-auto">
                             {item.axis_name}
                           </div>
