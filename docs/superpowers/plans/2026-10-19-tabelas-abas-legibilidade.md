@@ -97,11 +97,11 @@
 **Interfaces:**
 - Produces: `getPriorityBadge(priority?: string)` com 4 saídas (Alta, Média, Baixa, Não informada) nos estilos da tabela da spec; "Baixa" só quando o texto normalizado contém `baix`.
 
-- [ ] **Step 1: Selo** — reescrever `getPriorityBadge` (estilos suaves da spec, `variant="outline"` ou classes equivalentes).
-- [ ] **Step 2: Cards** — `@container`; tabela em `hidden @2xl:block`; cards `@2xl:hidden` sobre `paginatedData`, layout da spec (ação em destaque + selo no canto; programa; responsáveis). Vazio idêntico.
-- [ ] **Step 3: Gate** — `npx tsc --noEmit && npm run lint` limpo. Conferir "Não informada" trocando temporariamente, no DevTools/`portal evaluate`, ou num teste manual do switch com `getPriorityBadge("")` (sem commitar código de teste); descrever como conferiu.
-- [ ] **Step 4: Portal** — `/matriz?basin_id=3` e `?basin_id=9` em 1440 (tabela; barra aberta e recolhida), 768 e 390 (cards). Prioridades Alta/Média/Baixa visíveis com contraste; filtro por eixo + paginação iguais nos dois modos. Screenshots.
-- [ ] **Step 5: Commit** — `git commit -m "fix(matriz): cards em area estreita e prioridade vazia como Nao informada"` (+ trailer).
+- [x] **Step 1: Selo** — reescrever `getPriorityBadge` (estilos suaves da spec, `variant="outline"` ou classes equivalentes).
+- [x] **Step 2: Cards** — `@container`; tabela em `hidden @2xl:block`; cards `@2xl:hidden` sobre `paginatedData`, layout da spec (ação em destaque + selo no canto; programa; responsáveis). Vazio idêntico.
+- [x] **Step 3: Gate** — `npx tsc --noEmit && npm run lint` limpo. Conferir "Não informada" trocando temporariamente, no DevTools/`portal evaluate`, ou num teste manual do switch com `getPriorityBadge("")` (sem commitar código de teste); descrever como conferiu.
+- [x] **Step 4: Portal** — `/matriz?basin_id=3` e `?basin_id=9` em 1440 (tabela; barra aberta e recolhida), 768 e 390 (cards). Prioridades Alta/Média/Baixa visíveis com contraste; filtro por eixo + paginação iguais nos dois modos. Screenshots.
+- [x] **Step 5: Commit** — `git commit -m "fix(matriz): cards em area estreita e prioridade vazia como Nao informada"` (+ trailer).
 
 ---
 

@@ -109,12 +109,33 @@ export default function MatrizPage() {
   );
 
   const getPriorityBadge = (priority?: string) => {
-    const p = priority?.toLowerCase() || "";
+    const p = (priority ?? "")
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
     if (p.includes("alta"))
-      return <Badge className="bg-red-500 hover:bg-red-600">Alta</Badge>;
-    if (p.includes("méd") || p.includes("med"))
-      return <Badge className="bg-amber-500 hover:bg-amber-600">Média</Badge>;
-    return <Badge className="bg-emerald-500 hover:bg-emerald-600">Baixa</Badge>;
+      return (
+        <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+          Alta
+        </Badge>
+      );
+    if (p.includes("med"))
+      return (
+        <Badge variant="outline" className="bg-amber-50 text-amber-800 border-amber-200">
+          Média
+        </Badge>
+      );
+    if (p.includes("baix"))
+      return (
+        <Badge variant="outline" className="bg-emerald-50 text-emerald-700 border-emerald-200">
+          Baixa
+        </Badge>
+      );
+    return (
+      <Badge variant="outline" className="bg-slate-100 text-slate-600 border-slate-200">
+        Não informada
+      </Badge>
+    );
   };
 
   const clearFilters = () => {
@@ -235,9 +256,38 @@ export default function MatrizPage() {
           regionName={selectedReservoir.name}
           unavailableReason="A Matriz de Ação desta região ainda está sendo incorporada ao sistema a partir do plano oficial."
         >
-          <div className="rounded-2xl border border-slate-200 shadow-sm bg-white flex flex-col w-full max-w-[calc(100vw-2rem)] md:max-w-full overflow-hidden mb-6">
-            <div className="overflow-x-auto overflow-y-auto max-h-120 w-full">
-              <Table className="w-full table-fixed min-w-225">
+          {/* @container: tabela só quando a área tem 672px (@2xl); abaixo, cards */}
+          <div className="@container w-full mb-6">
+          <div className="rounded-2xl border border-slate-200 shadow-sm bg-white flex flex-col w-full">
+            {/* Cards (área estreita) */}
+            <ul className="divide-y divide-slate-100 @2xl:hidden">
+              {paginatedData.length > 0 ? (
+                paginatedData.map((item) => (
+                  <li key={item.id} className="p-5 space-y-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <p className="text-[15px] font-semibold text-slate-800 leading-snug wrap-break-word hyphens-auto">
+                        {item.acoes_especificas}
+                      </p>
+                      <div className="shrink-0">{getPriorityBadge(item.prioridade)}</div>
+                    </div>
+                    <p className="text-xs text-blue-600 font-bold uppercase tracking-wider wrap-break-word">
+                      {item.programa}
+                    </p>
+                    <p className="text-sm text-slate-600 leading-relaxed wrap-break-word hyphens-auto">
+                      {item.instituicoes_envolvidas}
+                    </p>
+                  </li>
+                ))
+              ) : (
+                <li className="h-40 flex items-center justify-center text-center text-slate-500 italic">
+                  Nenhuma ação encontrada.
+                </li>
+              )}
+            </ul>
+
+            {/* Tabela (área larga) */}
+            <div className="hidden @2xl:block overflow-y-auto max-h-120 w-full">
+              <Table className="w-full table-fixed">
                 <TableHeader className="bg-slate-50 sticky top-0 z-10 shadow-[0_1px_0_0_#e2e8f0]">
                   <TableRow className="border-slate-200">
                     <TableHead className="w-[45%] py-4 px-5 text-[10px] font-black uppercase text-slate-500 tracking-widest">
@@ -291,6 +341,7 @@ export default function MatrizPage() {
                 </TableBody>
               </Table>
             </div>
+          </div>
           </div>
 
           {/* Controles de Paginação */}
