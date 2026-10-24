@@ -43,7 +43,7 @@ export function RegionPicker() {
   const active = matched.find((r) => r.key === activeKey) ?? null;
 
   return (
-    <div className="grid w-full items-center gap-6 lg:grid-cols-[minmax(0,1fr)_13rem] xl:grid-cols-[minmax(0,1fr)_15rem]">
+    <div className="grid w-full items-center gap-6 lg:grid-cols-[minmax(26.25rem,55%)_minmax(0,1fr)] lg:gap-8 lg:items-start">
       <CearaRegionsMap
         enabledKeys={enabledKeys}
         activeKey={activeKey}

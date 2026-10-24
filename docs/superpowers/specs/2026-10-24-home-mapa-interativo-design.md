@@ -24,11 +24,15 @@ Fora da home: nada muda. `ReservoirContext`, API, rotas e as demais páginas fic
 
 ## Layout
 
-**Desktop (≥ lg):** duas colunas. Esquerda: título, parágrafo, dica, link da metodologia. Direita: mapa à esquerda do bloco "lista + resultado" (lista das 11 regiões com bolinha da cor, a ativa com fundo `#E4EFFB` e `aria-pressed`).
+> **Decisão do Guilherme em 2026-10-24 (substitui o layout em duas colunas e a ordem anterior do celular).**
 
-**Celular (< lg), ordem:** título → mapa (legenda "Toque em uma região") → seletor único "ou escolha pela lista" → resultado com botão → parágrafo → módulos. O mapa precisa estar visível sem rolar muito em 390×844; por isso o parágrafo desce para depois do resultado. Fade-in sequencial opcional via classes `animate-in` já usadas na página.
+**Ordem de conteúdo em todas as larguras:** título → parágrafo → dica "Escolha uma região no mapa…" → bloco do mapa (mapa + seletor/lista + painel com "Explorar região") → link "Conhecer a metodologia".
 
-**Seletor no celular:** reutilizar `ReservoirSelector fullWidth` (Radix) por consistência visual e porque já trata loading/erro, com a lista de itens limitada às 11 regiões conhecidas. *Se isso exigir mudar o componente, preferir um `<select>` nativo dentro do novo componente a alterar o compartilhado* (ele também é usado fora da home).
+**Celular (< lg):** coluna única nessa ordem; o mapa deixa de ficar na primeira dobra (aceito). Dentro do bloco: mapa (legenda "Toque em uma região") → "ou escolha pela lista" + seletor único → painel de resultado.
+
+**Desktop (≥ lg):** layout em linhas, também acima de 2xl (as duas colunas deixavam o mapa pequeno). Bloco de texto na largura toda (título em no máximo 3 linhas, parágrafo com `max-w-3xl`, dica); depois uma linha com o mapa à esquerda (~55% da largura, mínimo 420px) e, à direita, o painel de resultado seguido da lista das 11 regiões (bolinha da cor, ativa com fundo `#E4EFFB` e `aria-pressed`); por fim o link da metodologia.
+
+**Seletor no celular:** `<select>` nativo dentro do `RegionPicker` com só as 11 regiões e o nome oficial (o `ReservoirSelector` fica só para carregando/erro), para não alterar o componente compartilhado.
 
 ## Arquitetura
 
