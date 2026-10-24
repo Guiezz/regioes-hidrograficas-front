@@ -48,11 +48,11 @@
   - `interface MatchedRegion extends RegionDef { reservoir: ReservoirData | null }`
   - `matchRegions(api: ReservoirData[]): MatchedRegion[]` — sempre 11 itens; `reservoir` null quando não casa; itens da API sem região fixa são ignorados; em duplicidade usa o primeiro e `console.warn` fora de produção.
 
-- [ ] **Step 1: Escrever `scripts/check-regions.ts` com asserts (rodar com `npx tsx`)** cobrindo: `normalizeName("Região Hidrográfica do Médio Jaguaribe") === "medio jaguaribe"`; `normalizeName("SERTÕES DE CRATEÚS") === "sertoes de crateus"`; lista da API com as 11 regiões + 1 item extra qualquer → `matchRegions` retorna 11 e nenhum `reservoir` é o item extra; lista sem "Curu" → `curu.reservoir === null`; "Alto Jaguaribe" não casa com "Baixo Jaguaribe" nem "Médio Jaguaribe" (casamento por igualdade da chave normalizada, não por `includes`); **com a lista real da API** (`[{1,"Alto Jaguaribe"},{2,"Baixo Jaguaribe"},{3,"Banabuiú"},{4,"Crateús"},{5,"Coreaú"},{6,"Curu"},{7,"Ibiapaba"},{8,"Litoral"},{9,"Médio Jaguaribe"},{10,"Metropolitana"},{11,"Salgado"}]`) as 11 regiões casam, com `sertoes-de-crateus → id 4`, `serra-da-ibiapaba → id 7`, `bacias-metropolitanas → id 10`, e os `label` continuam os nomes oficiais.
-- [ ] **Step 2: Rodar e ver falhar** — `npx tsx scripts/check-regions.ts` → erro de módulo.
-- [ ] **Step 3: Implementar `src/lib/regions.ts`** com os valores da spec. Se `tsx` não estiver disponível, `npx --yes tsx`.
-- [ ] **Step 4: Rodar e ver passar** — saída `ok` sem exceção.
-- [ ] **Step 5: Gate e commit** — `git add src/lib/regions.ts scripts/check-regions.ts && git commit -m "feat(home): regiões fixas e casamento com a API"`
+- [x] **Step 1: Escrever `scripts/check-regions.ts` com asserts (rodar com `npx tsx`)** cobrindo: `normalizeName("Região Hidrográfica do Médio Jaguaribe") === "medio jaguaribe"`; `normalizeName("SERTÕES DE CRATEÚS") === "sertoes de crateus"`; lista da API com as 11 regiões + 1 item extra qualquer → `matchRegions` retorna 11 e nenhum `reservoir` é o item extra; lista sem "Curu" → `curu.reservoir === null`; "Alto Jaguaribe" não casa com "Baixo Jaguaribe" nem "Médio Jaguaribe" (casamento por igualdade da chave normalizada, não por `includes`); **com a lista real da API** (`[{1,"Alto Jaguaribe"},{2,"Baixo Jaguaribe"},{3,"Banabuiú"},{4,"Crateús"},{5,"Coreaú"},{6,"Curu"},{7,"Ibiapaba"},{8,"Litoral"},{9,"Médio Jaguaribe"},{10,"Metropolitana"},{11,"Salgado"}]`) as 11 regiões casam, com `sertoes-de-crateus → id 4`, `serra-da-ibiapaba → id 7`, `bacias-metropolitanas → id 10`, e os `label` continuam os nomes oficiais.
+- [x] **Step 2: Rodar e ver falhar** — `npx tsx scripts/check-regions.ts` → erro de módulo.
+- [x] **Step 3: Implementar `src/lib/regions.ts`** com os valores da spec. Se `tsx` não estiver disponível, `npx --yes tsx`.
+- [x] **Step 4: Rodar e ver passar** — saída `ok` sem exceção.
+- [x] **Step 5: Gate e commit** — `git add src/lib/regions.ts scripts/check-regions.ts && git commit -m "feat(home): regiões fixas e casamento com a API"`
 
 ### Task 2: Paths do mapa a partir do SVG
 
