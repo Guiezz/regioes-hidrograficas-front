@@ -62,9 +62,9 @@
 **Interfaces:**
 - Produces: `export const MAP_VIEWBOX = "0 0 2491 2752"`; `export const REGION_PATHS: Record<RegionKey, string>` (valor `d`); `export const DECORATIVE_PATH: string` (forma 5).
 
-- [ ] **Step 1: Gerar o arquivo com um script descartável** (fora do repo, ex.: `/tmp`): ler `docs/superpowers/assets/mapa_ceara_vetor.svg`, extrair os `d` de todos os `<path>`, descartar o índice 0 (contorno branco), usar os índices 1–12 conforme a tabela da spec (campo `shapeIndex` de `REGIONS`; forma 5 → `DECORATIVE_PATH`) e escrever o módulo TypeScript com `as const`. Não commitar o script.
-- [ ] **Step 2: Verificar** — `node -e` ou teste simples: 11 chaves em `REGION_PATHS`, todas as strings começam com `M`, `DECORATIVE_PATH` não vazio, tamanho do arquivo ≲ 60 KB.
-- [ ] **Step 3: Gate e commit** — `git add src/components/home/ceara-map-paths.ts && git commit -m "feat(home): paths do mapa do Ceará"`
+- [x] **Step 1: Gerar o arquivo com um script descartável** (fora do repo, ex.: `/tmp`): ler `docs/superpowers/assets/mapa_ceara_vetor.svg`, extrair os `d` de todos os `<path>`, descartar o índice 0 (contorno branco), usar os índices 1–12 conforme a tabela da spec (campo `shapeIndex` de `REGIONS`; forma 5 → `DECORATIVE_PATH`) e escrever o módulo TypeScript com `as const`. Não commitar o script.
+- [x] **Step 2: Verificar** — `node -e` ou teste simples: 11 chaves em `REGION_PATHS`, todas as strings começam com `M`, `DECORATIVE_PATH` não vazio, tamanho do arquivo ≲ 60 KB.
+- [x] **Step 3: Gate e commit** — `git add src/components/home/ceara-map-paths.ts && git commit -m "feat(home): paths do mapa do Ceará"`
 
 ### Task 3: Componente `CearaRegionsMap`
 

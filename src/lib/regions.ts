@@ -34,18 +34,19 @@ export function normalizeName(name: string): string {
     .trim();
 }
 
+// Ordem alfabética (pt-BR) por label; a lista da home segue esta ordem.
 const REGION_LIST: RegionDef[] = [
   { key: "alto-jaguaribe", label: "Alto Jaguaribe", color: "#569F4A", shapeIndex: 1, match: ["alto jaguaribe"] },
+  { key: "bacias-metropolitanas", label: "Bacias Metropolitanas", color: "#4D4D4D", shapeIndex: 4, match: ["bacias metropolitanas", "metropolitana"] },
   { key: "baixo-jaguaribe", label: "Baixo Jaguaribe", color: "#D40000", shapeIndex: 11, match: ["baixo jaguaribe"] },
   { key: "banabuiu", label: "Banabuiú", color: "#784421", shapeIndex: 2, match: ["banabuiu"] },
-  { key: "bacias-metropolitanas", label: "Bacias Metropolitanas", color: "#4D4D4D", shapeIndex: 4, match: ["bacias metropolitanas", "metropolitana"] },
   { key: "coreau", label: "Coreaú", color: "#672178", shapeIndex: 7, match: ["coreau"] },
   { key: "curu", label: "Curu", color: "#1187D0", shapeIndex: 9, match: ["curu"] },
   { key: "litoral", label: "Litoral", color: "#FF801A", shapeIndex: 10, match: ["litoral"] },
   { key: "medio-jaguaribe", label: "Médio Jaguaribe", color: "#242868", shapeIndex: 8, match: ["medio jaguaribe"] },
   { key: "salgado", label: "Salgado", color: "#D4AA00", shapeIndex: 6, match: ["salgado"] },
-  { key: "sertoes-de-crateus", label: "Sertões de Crateús", color: "#B26B45", shapeIndex: 3, match: ["sertoes de crateus", "crateus"] },
   { key: "serra-da-ibiapaba", label: "Serra da Ibiapaba", color: "#008001", shapeIndex: 12, match: ["serra da ibiapaba", "ibiapaba"] },
+  { key: "sertoes-de-crateus", label: "Sertões de Crateús", color: "#B26B45", shapeIndex: 3, match: ["sertoes de crateus", "crateus"] },
 ];
 
 export const REGIONS: RegionDef[] = [...REGION_LIST].sort((a, b) =>

@@ -8,6 +8,22 @@ assert.equal(
 );
 assert.equal(normalizeName("SERTÕES DE CRATEÚS"), "sertoes de crateus");
 assert.equal(REGIONS.length, 11);
+assert.deepEqual(
+  REGIONS.map((r) => r.label),
+  [
+    "Alto Jaguaribe",
+    "Bacias Metropolitanas",
+    "Baixo Jaguaribe",
+    "Banabuiú",
+    "Coreaú",
+    "Curu",
+    "Litoral",
+    "Médio Jaguaribe",
+    "Salgado",
+    "Serra da Ibiapaba",
+    "Sertões de Crateús",
+  ],
+);
 
 const nomesOficiais = [
   "Alto Jaguaribe",
