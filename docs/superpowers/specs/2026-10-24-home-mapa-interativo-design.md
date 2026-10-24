@@ -24,13 +24,11 @@ Fora da home: nada muda. `ReservoirContext`, API, rotas e as demais páginas fic
 
 ## Layout
 
-> **Decisão do Guilherme em 2026-10-24 (substitui o layout em duas colunas e a ordem anterior do celular).**
+> **Decisão do Guilherme em 2026-10-24 (substitui as versões anteriores desta seção).**
 
-**Ordem de conteúdo em todas as larguras:** título → parágrafo → dica "Escolha uma região no mapa…" → bloco do mapa (mapa + seletor/lista + painel com "Explorar região") → link "Conhecer a metodologia".
+**Desktop (≥ lg), inclusive acima de 1536px:** duas colunas (grade 4fr/8fr). Esquerda: título, parágrafo, dica e link "Conhecer a metodologia", centralizados na vertical em relação ao mapa. Direita: mapa à esquerda do bloco "painel de resultado (com "Explorar região") + lista das 11 regiões" (bolinha da cor, ativa com fundo `#E4EFFB` e `aria-pressed`).
 
-**Celular (< lg):** coluna única nessa ordem; o mapa deixa de ficar na primeira dobra (aceito). Dentro do bloco: mapa (legenda "Toque em uma região") → "ou escolha pela lista" + seletor único → painel de resultado.
-
-**Desktop (≥ lg):** layout em linhas, também acima de 2xl (as duas colunas deixavam o mapa pequeno). Bloco de texto na largura toda (título em no máximo 3 linhas, parágrafo com `max-w-3xl`, dica); depois uma linha com o mapa à esquerda (~55% da largura, mínimo 420px) e, à direita, o painel de resultado seguido da lista das 11 regiões (bolinha da cor, ativa com fundo `#E4EFFB` e `aria-pressed`); por fim o link da metodologia.
+**Celular (< lg), coluna única, nesta ordem:** título → parágrafo → dica "Escolha uma região no mapa…" → mapa (legenda "Toque em uma região") → "ou escolha pela lista" + seletor único → painel de resultado → link "Conhecer a metodologia". O mapa deixa de ficar na primeira dobra (aceito).
 
 **Seletor no celular:** `<select>` nativo dentro do `RegionPicker` com só as 11 regiões e o nome oficial (o `ReservoirSelector` fica só para carregando/erro), para não alterar o componente compartilhado.
 

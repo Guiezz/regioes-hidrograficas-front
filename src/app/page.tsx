@@ -35,10 +35,10 @@ export default function HomePage() {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-primary/[2%] via-transparent to-primary/[1%] pointer-events-none" />
 
-        <div className="relative flex flex-col gap-8 px-6 py-10 lg:px-12 lg:py-14 max-w-7xl mx-auto">
-          {/* Título, descrição e dica */}
-          <div className="min-w-0 space-y-5 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
-            <h1 className="text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight leading-tight">
+        <div className="relative grid grid-cols-1 gap-x-10 gap-y-8 px-6 py-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:grid-rows-[1fr_auto_auto_auto_auto_1fr] lg:gap-y-0 lg:px-12 lg:py-14 max-w-7xl mx-auto">
+          {/* Título, descrição e dica (no desktop cada item ocupa a coluna da esquerda) */}
+          <div className="min-w-0 flex flex-col gap-5 lg:contents">
+            <h1 className="min-w-0 text-3xl sm:text-4xl xl:text-5xl font-bold tracking-tight leading-tight animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both lg:col-start-1 lg:row-start-2">
               <span className="bg-gradient-to-r from-[#005384] via-[#0077b6] to-[#0094e0] bg-clip-text text-transparent">
                 Sistema de Informações de Gestão
               </span>{" "}
@@ -46,25 +46,25 @@ export default function HomePage() {
                 das Regiões Hidrográficas do Ceará
               </span>
             </h1>
-            <p className="text-base md:text-lg text-[#1e3a5f] font-normal leading-relaxed text-justify [hyphens:auto] max-w-3xl">
+            <p className="min-w-0 text-base md:text-lg text-[#1e3a5f] font-normal leading-relaxed text-justify [hyphens:auto] max-w-3xl lg:max-w-2xl animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms] lg:col-start-1 lg:row-start-3 lg:mt-6">
               Plataforma integrada de inteligência e governança hídrica voltada ao
               diagnóstico situacional, planejamento estratégico e suporte à tomada de
               decisão sobre as 11 regiões hidrográficas do Estado do Ceará.
             </p>
-            <p className="text-sm text-[#2b5278]">
+            <p className="min-w-0 text-sm text-[#2b5278] animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms] lg:col-start-1 lg:row-start-4 lg:mt-4">
               Escolha uma região no mapa para carregar o diagnóstico, os planos e
               os custos dela.
             </p>
           </div>
 
           {/* Mapa interativo */}
-          <div className="min-w-0 animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms]">
+          <div className="min-w-0 animate-in fade-in duration-1000 fill-mode-both [--tw-animation-delay:200ms] lg:col-start-2 lg:row-span-6 lg:row-start-1 lg:self-center">
             <RegionPicker />
           </div>
 
           <Link
             href="/metodologia"
-            className="inline-flex w-fit items-center gap-1 text-sm font-semibold text-[#005384] hover:text-[#0094e0] transition-colors"
+            className="inline-flex w-fit items-center gap-1 text-sm font-semibold text-[#005384] hover:text-[#0094e0] transition-colors animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both [--tw-animation-delay:100ms] lg:col-start-1 lg:row-start-5 lg:mt-4 lg:self-start"
           >
             Conhecer a metodologia
             <ArrowRight className="h-4 w-4" />

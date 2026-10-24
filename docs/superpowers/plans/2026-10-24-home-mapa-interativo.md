@@ -108,3 +108,5 @@
 
 
 - **Ajuste de layout pós-PR (decisão do Guilherme, 2026-10-24):** a home passa a ter coluna única em todas as larguras: título → parágrafo → dica → bloco do mapa → link da metodologia. No desktop (≥ lg) o bloco do mapa é mapa (~55%, mín. 420px) + painel de resultado e lista à direita; as duas colunas anteriores (4fr/8fr) deixavam o mapa pequeno, então o layout em linhas vale também a partir de 2xl. No celular o parágrafo e a dica sobem para antes do mapa e a metodologia vai para o fim; o mapa sai da primeira dobra (aceito). Spec (seção Layout) atualizada.
+- **Layout final (decisão do Guilherme, 2026-10-24, substitui o "layout em linhas" do item anterior):** desktop (≥ lg) volta às duas colunas do commit `1a534c2` (grade 4fr/8fr, texto à esquerda, `RegionPicker` à direita), inclusive acima de 1536px; celular (< lg) mantém a ordem nova: título → parágrafo → dica → mapa → seletor → painel → metodologia. No DOM os itens ficam na ordem do celular e no desktop são posicionados por grade (`lg:contents` no bloco de texto, linhas `1fr/auto/auto/auto/auto/1fr`). Medido em 1280 e 1600 contra o `1a534c2`: mesmas posições (±2px) e mapa de 263px em 1280.
+
