@@ -31,13 +31,6 @@ export function CearaRegionsMap({
 }: CearaRegionsMapProps) {
   const focusKey = disabled ? null : (hoverKey ?? activeKey);
 
-  // A região em foco é desenhada por último para o contorno ficar por cima
-  const ordered = [...REGIONS].sort((a, b) => {
-    if (a.key === focusKey) return 1;
-    if (b.key === focusKey) return -1;
-    return 0;
-  });
-
   return (
     <figure className={cn("w-full", className)}>
       <svg
@@ -53,7 +46,7 @@ export function CearaRegionsMap({
           className="pointer-events-none transition-opacity motion-reduce:transition-none"
           opacity={focusKey ? 0.5 : disabled ? 0.5 : 1}
         />
-        {ordered.map((region) => {
+        {REGIONS.map((region) => {
           const enabled = enabledKeys.includes(region.key);
           const isFocus = region.key === focusKey;
           const opacity = disabled
@@ -69,7 +62,7 @@ export function CearaRegionsMap({
               d={REGION_PATHS[region.key]}
               fill={enabled ? region.color : NEUTRAL_FILL}
               stroke="#fff"
-              strokeWidth={isFocus ? 16 : 9}
+              strokeWidth={9}
               strokeLinejoin="round"
               opacity={opacity}
               aria-hidden="true"
@@ -84,6 +77,17 @@ export function CearaRegionsMap({
             />
           );
         })}
+        {focusKey && (
+          <path
+            d={REGION_PATHS[focusKey]}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={16}
+            strokeLinejoin="round"
+            aria-hidden="true"
+            className="pointer-events-none"
+          />
+        )}
       </svg>
       <figcaption className="mt-2 text-center text-xs text-slate-500">
         <span className="lg:hidden">Toque em uma região</span>
