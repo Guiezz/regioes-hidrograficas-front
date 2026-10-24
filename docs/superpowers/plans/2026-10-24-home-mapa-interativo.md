@@ -108,4 +108,3 @@
 
 
 - **Ajuste de layout pós-PR (decisão do Guilherme, 2026-10-24):** a home passa a ter coluna única em todas as larguras: título → parágrafo → dica → bloco do mapa → link da metodologia. No desktop (≥ lg) o bloco do mapa é mapa (~55%, mín. 420px) + painel de resultado e lista à direita; as duas colunas anteriores (4fr/8fr) deixavam o mapa pequeno, então o layout em linhas vale também a partir de 2xl. No celular o parágrafo e a dica sobem para antes do mapa e a metodologia vai para o fim; o mapa sai da primeira dobra (aceito). Spec (seção Layout) atualizada.
-\n
