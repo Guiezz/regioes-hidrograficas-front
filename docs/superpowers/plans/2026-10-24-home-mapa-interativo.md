@@ -96,8 +96,8 @@
 
 ### Task 5: Build e PR
 
-- [ ] **Step 1:** `npx tsc --noEmit && npm run lint && npm run build` → sem erros; anotar o tamanho da rota `/` no output do build.
-- [ ] **Step 2:** `git push -u origin feat/home-mapa-interativo` e abrir PR para `dev` com capturas desktop e celular; mencionar o que saiu da home (imagens, dropdown, CTAs) e que `scripts/check-regions.ts` existe.
+- [x] **Step 1:** `npx tsc --noEmit && npm run lint && npm run build` → sem erros; anotar o tamanho da rota `/` no output do build.
+- [x] **Step 2:** `git push -u origin feat/home-mapa-interativo` e abrir PR para `dev` com capturas desktop e celular; mencionar o que saiu da home (imagens, dropdown, CTAs) e que `scripts/check-regions.ts` existe.
 
 ## Desvios
 
